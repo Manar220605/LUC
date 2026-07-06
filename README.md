@@ -4,8 +4,6 @@ A Reddit-style Q&A platform connecting Lebanese University students with alumni.
 
 ## How to run
 
-> Docker Compose setup is added in Step 1. Once available:
-
 ```bash
 cp .env.example .env
 # Edit .env and set secrets (KEYCLOAK_ADMIN_CLIENT_SECRET, NEXTAUTH_SECRET)

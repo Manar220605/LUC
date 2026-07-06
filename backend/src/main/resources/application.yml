@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: luc-backend
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: when_authorized
+
+server:
+  port: 8080

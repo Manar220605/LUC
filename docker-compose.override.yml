@@ -1,0 +1,9 @@
+# Dev overrides: volume mounts + hot reload (full hot reload wired in later steps)
+services:
+  backend:
+    volumes:
+      - ./backend/src:/app/src:ro
+
+  frontend:
+    volumes:
+      - ./frontend/src:/app/src:ro

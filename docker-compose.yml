@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: luc
+      POSTGRES_USER: luc
+      POSTGRES_PASSWORD: luc
+    ports: ["5432:5432"]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U luc"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/luc
+      KC_DB_USERNAME: luc
+      KC_DB_PASSWORD: luc
+      KC_HEALTH_ENABLED: "true"
+      KC_HOSTNAME_URL: http://localhost:8081
+    ports: ["8081:8080"]
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/luc
+      SPRING_DATASOURCE_USERNAME: luc
+      SPRING_DATASOURCE_PASSWORD: luc
+      KEYCLOAK_ISSUER_URI: http://host.docker.internal:8081/realms/luc
+      KEYCLOAK_JWK_URI: http://host.docker.internal:8081/realms/luc/protocol/openid-connect/certs
+      KEYCLOAK_SERVER_URL: http://host.docker.internal:8081
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+    ports: ["8080:8080"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+      KEYCLOAK_ISSUER: http://localhost:8081/realms/luc
+      KEYCLOAK_CLIENT_ID: luc-frontend
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+    ports: ["3000:3000"]
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
