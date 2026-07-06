@@ -1,15 +1,38 @@
 spring:
   application:
     name: luc-backend
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      show-details: when_authorized
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.format_sql: true
+      hibernate.jdbc.time_zone: UTC
+    open-in-view: false
+  liquibase:
+    change-log: classpath:db/changelog/master.xml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI}
+          jwk-set-uri: ${KEYCLOAK_JWK_URI}
 
 server:
   port: 8080
+  servlet:
+    context-path: /
+
+keycloak:
+  admin:
+    server-url: ${KEYCLOAK_SERVER_URL}
+    realm: luc
+    client-id: luc-admin-client
+    client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+
+springdoc:
+  api-docs.path: /v3/api-docs
+  swagger-ui.path: /swagger-ui.html
