@@ -1,6 +1,7 @@
 package com.luc.qa.common.config;
 
 import com.luc.qa.common.security.JwtRoleConverter;
+import com.luc.qa.module.user.filter.UserProvisioningFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -21,6 +23,7 @@ public class SecurityConfig {
 
     private final JwtRoleConverter jwtRoleConverter;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final UserProvisioningFilter userProvisioningFilter;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -43,8 +46,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt ->
-                jwt.jwtAuthenticationConverter(jwtRoleConverter)));
-            // TODO(decide): add UserProvisioningFilter after Step 4 user module
+                jwt.jwtAuthenticationConverter(jwtRoleConverter)))
+            .addFilterAfter(userProvisioningFilter, BearerTokenAuthenticationFilter.class);
         return http.build();
     }
 }
