@@ -42,6 +42,7 @@ services:
       KEYCLOAK_JWK_URI: http://host.docker.internal:8081/realms/luc/protocol/openid-connect/certs
       KEYCLOAK_SERVER_URL: http://host.docker.internal:8081
       KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+      SPRING_PROFILES_ACTIVE: dev
     ports: ["8080:8080"]
     extra_hosts:
       - "host.docker.internal:host-gateway"

@@ -6,5 +6,6 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <include file="changes/001-initial-schema.xml" relativeToChangelogFile="true"/>
+    <include file="changes/002-add-communities.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

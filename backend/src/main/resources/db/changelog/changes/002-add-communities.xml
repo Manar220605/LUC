@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="002-create-communities" author="luc">
+        <createTable tableName="communities">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(200)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="slug" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="parent_id" type="BIGINT"/>
+            <column name="depth" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="question_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="communities"
+            baseColumnNames="parent_id"
+            constraintName="fk_communities_parent"
+            referencedTableName="communities"
+            referencedColumnNames="id"/>
+
+        <createIndex indexName="idx_communities_path" tableName="communities">
+            <column name="path"/>
+        </createIndex>
+        <createIndex indexName="idx_communities_parent_id" tableName="communities">
+            <column name="parent_id"/>
+        </createIndex>
+        <createIndex indexName="idx_communities_depth" tableName="communities">
+            <column name="depth"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
