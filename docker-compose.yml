@@ -56,7 +56,9 @@ services:
     build: ./frontend
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8080
+      API_URL: http://backend:8080
       KEYCLOAK_ISSUER: http://localhost:8081/realms/luc
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
       KEYCLOAK_CLIENT_ID: luc-frontend
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}

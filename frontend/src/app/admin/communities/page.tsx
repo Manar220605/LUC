@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import type {
   CommunityTreeNodeDTO,
@@ -13,9 +13,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 async function apiRequest<T>(
   path: string,
-  token: string | undefined,
   init: RequestInit = {}
 ): Promise<T> {
+  const session = await getSession();
+  if (session?.error === 'RefreshAccessTokenError') {
+    throw new Error('Session expired; please sign in again');
+  }
+  const token = session?.accessToken;
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
@@ -43,7 +47,7 @@ function flattenTree(nodes: CommunityTreeNodeDTO[]): CommunityTreeNodeDTO[] {
 }
 
 export default function AdminCommunitiesPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [tree, setTree] = useState<CommunityTreeNodeDTO[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -57,8 +61,6 @@ export default function AdminCommunitiesPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
-
-  const token = session?.accessToken;
 
   const loadTree = useCallback(async () => {
     setLoading(true);
@@ -96,7 +98,7 @@ export default function AdminCommunitiesPage() {
         description: createDescription.trim() || undefined,
         parentPath: createParentPath.trim() || undefined,
       };
-      await apiRequest('/api/admin/communities', token, {
+      await apiRequest('/api/admin/communities', {
         method: 'POST',
         body: JSON.stringify(body),
       });
@@ -120,7 +122,7 @@ export default function AdminCommunitiesPage() {
         name: editName.trim(),
         description: editDescription.trim() || undefined,
       };
-      await apiRequest(`/api/admin/communities/${editId}`, token, {
+      await apiRequest(`/api/admin/communities/${editId}`, {
         method: 'PUT',
         body: JSON.stringify(body),
       });
@@ -134,7 +136,7 @@ export default function AdminCommunitiesPage() {
   async function handleDelete(id: number) {
     setError(null);
     try {
-      await apiRequest(`/api/admin/communities/${id}`, token, { method: 'DELETE' });
+      await apiRequest(`/api/admin/communities/${id}`, { method: 'DELETE' });
       if (editId === id) {
         setEditId(null);
       }

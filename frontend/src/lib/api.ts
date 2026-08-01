@@ -1,9 +1,14 @@
 import { auth } from '@/lib/auth';
 
+const API_URL =
+  process.env.API_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  'http://localhost:8080';
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const session = await auth();
   const token = session?.accessToken;
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
+  const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
