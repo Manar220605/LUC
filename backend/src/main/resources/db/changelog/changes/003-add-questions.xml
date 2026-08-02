@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="003-create-questions" author="luc">
+        <createTable tableName="questions">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="author_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="community_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(300)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_anonymous" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="OPEN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="view_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="answer_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="questions"
+            baseColumnNames="author_id"
+            constraintName="fk_questions_author"
+            referencedTableName="users"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="questions"
+            baseColumnNames="community_id"
+            constraintName="fk_questions_community"
+            referencedTableName="communities"
+            referencedColumnNames="id"/>
+
+        <createIndex indexName="idx_questions_created_at" tableName="questions">
+            <column name="created_at" descending="true"/>
+        </createIndex>
+        <createIndex indexName="idx_questions_score" tableName="questions">
+            <column name="score" descending="true"/>
+        </createIndex>
+        <createIndex indexName="idx_questions_author_id" tableName="questions">
+            <column name="author_id"/>
+        </createIndex>
+        <createIndex indexName="idx_questions_status" tableName="questions">
+            <column name="status"/>
+        </createIndex>
+        <createIndex indexName="idx_questions_community_id" tableName="questions">
+            <column name="community_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

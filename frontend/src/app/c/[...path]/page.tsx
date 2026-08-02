@@ -1,7 +1,13 @@
 import { apiPublicGet } from '@/lib/apiPublic';
-import type { CommunityResponseDTO, CommunityTreeNodeDTO } from '@/lib/types';
+import type {
+  CommunityResponseDTO,
+  CommunityTreeNodeDTO,
+  PageResponseDTO,
+  QuestionSummaryDTO,
+} from '@/lib/types';
 import CommunityBreadcrumb from '@/components/community/CommunityBreadcrumb';
 import CommunityTree from '@/components/community/CommunityTree';
+import FeedList from '@/components/question/FeedList';
 
 type Props = {
   params: Promise<{ path: string[] }>;
@@ -11,9 +17,12 @@ export default async function CommunityPage({ params }: Props) {
   const { path: segments } = await params;
   const path = segments.join('/');
 
-  const [community, tree] = await Promise.all([
+  const [community, tree, feed] = await Promise.all([
     apiPublicGet<CommunityResponseDTO>(`/api/communities/by-path?path=${encodeURIComponent(path)}`),
     apiPublicGet<CommunityTreeNodeDTO[]>('/api/communities'),
+    apiPublicGet<PageResponseDTO<QuestionSummaryDTO>>(
+      `/api/feed?community=${encodeURIComponent(path)}&includeDescendants=true&sort=NEW&page=0&size=20`
+    ),
   ]);
 
   return (
@@ -29,6 +38,16 @@ export default async function CommunityPage({ params }: Props) {
         <h2 className="text-lg font-semibold text-gray-900">Browse communities</h2>
         <div className="mt-3 rounded-lg border border-gray-200 bg-white p-4">
           <CommunityTree nodes={tree} currentPath={path} />
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold text-gray-900">Questions</h2>
+        <div className="mt-3">
+          <FeedList
+            items={feed.content}
+            emptyMessage="No questions in this community yet."
+          />
         </div>
       </section>
     </main>
