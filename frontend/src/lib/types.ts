@@ -95,3 +95,40 @@ export type CreateQuestionRequestDTO = {
   body: string;
   anonymous?: boolean;
 };
+
+export type AnswerTreeNodeDTO = {
+  id: number;
+  body: string;
+  author: PublicAuthorDTO;
+  anonymous: boolean;
+  deleted: boolean;
+  score: number;
+  createdAt: string;
+  updatedAt: string;
+  ownedByCurrentUser: boolean;
+  replies: AnswerTreeNodeDTO[];
+};
+
+export type AnswerResponseDTO = {
+  id: number;
+  questionId: number;
+  parentAnswerId: number | null;
+  body: string;
+  author: PublicAuthorDTO;
+  anonymous: boolean;
+  deleted: boolean;
+  score: number;
+  createdAt: string;
+  updatedAt: string;
+  ownedByCurrentUser: boolean;
+};
+
+export type CreateAnswerRequestDTO = {
+  body: string;
+  anonymous?: boolean;
+};
+
+export type UpdateAnswerRequestDTO = {
+  body: string;
+  anonymous?: boolean;
+};

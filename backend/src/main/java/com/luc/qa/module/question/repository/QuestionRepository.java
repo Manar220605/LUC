@@ -25,4 +25,12 @@ public interface QuestionRepository
     @Modifying
     @Query("UPDATE Question q SET q.viewCount = q.viewCount + 1 WHERE q.id = :id")
     void incrementViewCount(@Param("id") Long id);
+
+    @Modifying
+    @Query("UPDATE Question q SET q.answerCount = q.answerCount + 1 WHERE q.id = :id")
+    void incrementAnswerCount(@Param("id") Long id);
+
+    @Modifying
+    @Query("UPDATE Question q SET q.answerCount = q.answerCount - 1 WHERE q.id = :id AND q.answerCount > 0")
+    void decrementAnswerCount(@Param("id") Long id);
 }
