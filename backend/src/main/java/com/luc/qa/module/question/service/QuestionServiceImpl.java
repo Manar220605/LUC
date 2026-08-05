@@ -18,9 +18,13 @@ import com.luc.qa.module.question.repository.QuestionRepository;
 import com.luc.qa.module.question.specification.QuestionSpecifications;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.repository.UserRepository;
+import com.luc.qa.module.vote.service.VoteService;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +40,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final UserRepository userRepository;
     private final CommunityRepository communityRepository;
     private final QuestionMapper questionMapper;
+    private final VoteService voteService;
 
     @Override
     @Transactional(readOnly = true)
@@ -46,7 +51,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<QuestionSummaryDTO> findFeed(QuestionFilterDTO filter, Pageable pageable) {
+    public Page<QuestionSummaryDTO> findFeed(QuestionFilterDTO filter, Pageable pageable, String keycloakId) {
         Specification<Question> spec = Specification.where(
             QuestionSpecifications.hasStatus(QuestionStatus.OPEN)
         );
@@ -64,14 +69,19 @@ public class QuestionServiceImpl implements QuestionService {
         Pageable sortedPageable = pageable;
         FeedSort sort = filter.getSort() != null ? filter.getSort() : FeedSort.NEW;
         if (sort == FeedSort.NEW || sort == FeedSort.HOT || sort == FeedSort.TOP) {
-            sortedPageable = org.springframework.data.domain.PageRequest.of(
+            sortedPageable = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "createdAt")
             );
         }
 
-        return questionRepository.findAll(spec, sortedPageable).map(questionMapper::toSummary);
+        Page<Question> questions = questionRepository.findAll(spec, sortedPageable);
+        List<QuestionSummaryDTO> summaries = questions.getContent().stream()
+            .map(questionMapper::toSummary)
+            .toList();
+        voteService.enrichQuestionSummaries(summaries, questions.getContent(), keycloakId);
+        return new PageImpl<>(summaries, questions.getPageable(), questions.getTotalElements());
     }
 
     @Override

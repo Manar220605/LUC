@@ -16,6 +16,7 @@ import com.luc.qa.module.question.repository.QuestionRepository;
 import com.luc.qa.module.question.service.QuestionService;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.repository.UserRepository;
+import com.luc.qa.module.vote.service.VoteService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final QuestionService questionService;
     private final UserRepository userRepository;
     private final AnswerMapper answerMapper;
+    private final VoteService voteService;
 
     @Override
     @Transactional(readOnly = true)
@@ -56,9 +58,11 @@ public class AnswerServiceImpl implements AnswerService {
             }
         }
 
-        return roots.stream()
+        List<AnswerTreeNodeDTO> tree = roots.stream()
             .map(root -> buildTreeNode(root, childrenByParentId, currentUserId))
             .toList();
+        voteService.enrichAnswerTree(tree, keycloakId);
+        return tree;
     }
 
     @Override

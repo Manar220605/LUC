@@ -16,13 +16,12 @@ type Props = {
 export default async function CommunityPage({ params }: Props) {
   const { path: segments } = await params;
   const path = segments.join('/');
+  const feedQuery = `?community=${encodeURIComponent(path)}&includeDescendants=true&sort=NEW&page=0&size=20`;
 
   const [community, tree, feed] = await Promise.all([
     apiPublicGet<CommunityResponseDTO>(`/api/communities/by-path?path=${encodeURIComponent(path)}`),
     apiPublicGet<CommunityTreeNodeDTO[]>('/api/communities'),
-    apiPublicGet<PageResponseDTO<QuestionSummaryDTO>>(
-      `/api/feed?community=${encodeURIComponent(path)}&includeDescendants=true&sort=NEW&page=0&size=20`
-    ),
+    apiPublicGet<PageResponseDTO<QuestionSummaryDTO>>(`/api/feed${feedQuery}`),
   ]);
 
   return (
@@ -46,6 +45,7 @@ export default async function CommunityPage({ params }: Props) {
         <div className="mt-3">
           <FeedList
             items={feed.content}
+            feedQuery={feedQuery}
             emptyMessage="No questions in this community yet."
           />
         </div>

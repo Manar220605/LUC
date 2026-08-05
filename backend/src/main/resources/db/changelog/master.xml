@@ -9,5 +9,6 @@
     <include file="changes/002-add-communities.xml" relativeToChangelogFile="true"/>
     <include file="changes/003-add-questions.xml" relativeToChangelogFile="true"/>
     <include file="changes/004-add-answers.xml" relativeToChangelogFile="true"/>
+    <include file="changes/005-add-votes.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

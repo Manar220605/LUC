@@ -24,7 +24,8 @@ public class FeedServiceImpl implements FeedService {
         String communityPath,
         boolean includeDescendants,
         int page,
-        int size
+        int size,
+        String keycloakId
     ) {
         QuestionFilterDTO filter = new QuestionFilterDTO();
         filter.setSort(sort != null ? sort : FeedSort.NEW);
@@ -33,7 +34,8 @@ public class FeedServiceImpl implements FeedService {
 
         Page<QuestionSummaryDTO> result = questionService.findFeed(
             filter,
-            PageRequest.of(page, size)
+            PageRequest.of(page, size),
+            keycloakId
         );
 
         return PageResponseDTO.<QuestionSummaryDTO>builder()

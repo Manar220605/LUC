@@ -12,6 +12,7 @@ public interface FeedService {
         String communityPath,
         boolean includeDescendants,
         int page,
-        int size
+        int size,
+        String keycloakId
     );
 }

@@ -64,6 +64,8 @@ export type QuestionSummaryDTO = {
   answerCount: number;
   viewCount: number;
   createdAt: string;
+  viewerVote?: number | null;
+  ownedByCurrentUser?: boolean;
 };
 
 export type QuestionResponseDTO = {
@@ -79,6 +81,8 @@ export type QuestionResponseDTO = {
   score: number;
   createdAt: string;
   updatedAt: string;
+  viewerVote?: number | null;
+  ownedByCurrentUser?: boolean;
 };
 
 export type PageResponseDTO<T> = {
@@ -106,6 +110,7 @@ export type AnswerTreeNodeDTO = {
   createdAt: string;
   updatedAt: string;
   ownedByCurrentUser: boolean;
+  viewerVote?: number | null;
   replies: AnswerTreeNodeDTO[];
 };
 

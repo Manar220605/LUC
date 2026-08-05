@@ -1,12 +1,56 @@
+'use client';
+
 import Link from 'next/link';
-import type { QuestionSummaryDTO } from '@/lib/types';
+import { useEffect, useState } from 'react';
+import { getSession } from 'next-auth/react';
+import VoteControls from '@/components/vote/VoteControls';
+import type { PageResponseDTO, QuestionSummaryDTO } from '@/lib/types';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 type Props = {
   items: QuestionSummaryDTO[];
+  feedQuery: string;
   emptyMessage?: string;
 };
 
-export default function FeedList({ items, emptyMessage = 'No questions yet.' }: Props) {
+export default function FeedList({ items: initialItems, feedQuery, emptyMessage = 'No questions yet.' }: Props) {
+  const [items, setItems] = useState(initialItems);
+
+  useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function enrichWithViewerVotes() {
+      const session = await getSession();
+      if (!session?.accessToken || session.error === 'RefreshAccessTokenError') {
+        return;
+      }
+
+      const res = await fetch(`${API_URL}/api/feed${feedQuery}`, {
+        headers: { Authorization: `Bearer ${session.accessToken}` },
+        cache: 'no-store',
+      });
+      if (!res.ok || cancelled) {
+        return;
+      }
+
+      const feed: PageResponseDTO<QuestionSummaryDTO> = await res.json();
+      setItems(feed.content);
+    }
+
+    enrichWithViewerVotes().catch(() => {
+      // keep the public feed if enrichment fails
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [feedQuery]);
+
   if (items.length === 0) {
     return <p className="text-sm text-gray-500">{emptyMessage}</p>;
   }
@@ -15,7 +59,21 @@ export default function FeedList({ items, emptyMessage = 'No questions yet.' }: 
     <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
       {items.map((item) => (
         <li key={item.id} className="px-4 py-4">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <VoteControls
+              targetType="QUESTION"
+              targetId={item.id}
+              score={item.score}
+              viewerVote={item.viewerVote}
+              disabled={item.ownedByCurrentUser === true}
+              onVoteChange={(score, viewerVote) => {
+                setItems((current) =>
+                  current.map((entry) =>
+                    entry.id === item.id ? { ...entry, score, viewerVote } : entry
+                  )
+                );
+              }}
+            />
             <div className="min-w-0 flex-1">
               <Link
                 href={`/questions/${item.id}`}
@@ -30,13 +88,9 @@ export default function FeedList({ items, emptyMessage = 'No questions yet.' }: 
                 </Link>
               </p>
               <p className="mt-1 text-xs text-gray-500">
-                {new Date(item.createdAt).toLocaleString()}
+                {new Date(item.createdAt).toLocaleString()} · {item.answerCount} answers ·{' '}
+                {item.viewCount} views
               </p>
-            </div>
-            <div className="shrink-0 text-right text-xs text-gray-500">
-              <div>{item.score} score</div>
-              <div>{item.answerCount} answers</div>
-              <div>{item.viewCount} views</div>
             </div>
           </div>
         </li>

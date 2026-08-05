@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { getSession, signIn, useSession } from 'next-auth/react';
+import VoteControls from '@/components/vote/VoteControls';
 import type {
   AnswerResponseDTO,
   AnswerTreeNodeDTO,
@@ -125,6 +126,23 @@ function patchDeletedAnswerInTree(
 
 function countAnswerNodes(nodes: AnswerTreeNodeDTO[]): number {
   return nodes.reduce((total, node) => total + 1 + countAnswerNodes(node.replies), 0);
+}
+
+function patchVoteInTree(
+  nodes: AnswerTreeNodeDTO[],
+  answerId: number,
+  score: number,
+  viewerVote: number | null
+): AnswerTreeNodeDTO[] {
+  return nodes.map((node) => {
+    if (node.id === answerId) {
+      return { ...node, score, viewerVote };
+    }
+    return {
+      ...node,
+      replies: patchVoteInTree(node.replies, answerId, score, viewerVote),
+    };
+  });
 }
 
 function finalizeAnswerTree(
@@ -300,12 +318,14 @@ function AnswerNode({
   ownedAnswerIds,
   onChanged,
   onSignInRequired,
+  onVoteChange,
 }: {
   answer: AnswerTreeNodeDTO;
   depth: number;
   ownedAnswerIds: ReadonlySet<number>;
   onChanged: OnAnswersChanged;
   onSignInRequired: () => void;
+  onVoteChange: (answerId: number, score: number, viewerVote: number | null) => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
@@ -363,28 +383,40 @@ function AnswerNode({
       style={{ marginLeft: depth > 0 ? '0.75rem' : undefined }}
     >
       <article className="rounded-lg border border-gray-200 bg-white p-4">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
-          <span className="font-medium text-gray-700">{answer.author.displayName}</span>
-          <span>{new Date(answer.createdAt).toLocaleString()}</span>
-          <span>{answer.score} score</span>
-        </div>
+        <div className="flex items-start gap-3">
+          {!answer.deleted && (
+            <VoteControls
+              targetType="ANSWER"
+              targetId={answer.id}
+              score={answer.score}
+              viewerVote={answer.viewerVote}
+              disabled={isOwner}
+              onVoteChange={(score, viewerVote) => onVoteChange(answer.id, score, viewerVote)}
+            />
+          )}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
+              <span className="font-medium text-gray-700">{answer.author.displayName}</span>
+              <span>{new Date(answer.createdAt).toLocaleString()}</span>
+              {answer.deleted && <span>{answer.score} score</span>}
+            </div>
 
-        {editOpen && isOwner ? (
-          <AnswerComposer
-            key={`edit-${answer.id}-${answer.updatedAt}`}
-            label="Edit answer"
-            initialBody={answer.body}
-            initialAnonymous={answer.anonymous}
-            onSubmit={handleEdit}
-            onCancel={() => setEditOpen(false)}
-          />
-        ) : (
-          <p className="mt-2 whitespace-pre-wrap text-gray-800">{answer.body}</p>
-        )}
+            {editOpen && isOwner ? (
+              <AnswerComposer
+                key={`edit-${answer.id}-${answer.updatedAt}`}
+                label="Edit answer"
+                initialBody={answer.body}
+                initialAnonymous={answer.anonymous}
+                onSubmit={handleEdit}
+                onCancel={() => setEditOpen(false)}
+              />
+            ) : (
+              <p className="mt-2 whitespace-pre-wrap text-gray-800">{answer.body}</p>
+            )}
 
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
           {!answer.deleted && (
             <button
               type="button"
@@ -423,6 +455,8 @@ function AnswerNode({
                 : 'Hide replies'}
             </button>
           )}
+            </div>
+          </div>
         </div>
 
         {replyOpen && (
@@ -444,6 +478,7 @@ function AnswerNode({
               ownedAnswerIds={ownedAnswerIds}
               onChanged={onChanged}
               onSignInRequired={onSignInRequired}
+              onVoteChange={onVoteChange}
             />
           ))}
         </div>
@@ -633,6 +668,13 @@ export default function AnswerThread({
     [questionId, onAnswersChanged, registerOwnedAnswer, syncOwnedAnswerIds]
   );
 
+  const handleVoteChange = useCallback(
+    (answerId: number, score: number, viewerVote: number | null) => {
+      setAnswers((current) => patchVoteInTree(current, answerId, score, viewerVote));
+    },
+    []
+  );
+
   function requireSignIn() {
     signIn('keycloak', { callbackUrl: window.location.href });
   }
@@ -706,6 +748,7 @@ export default function AnswerThread({
               ownedAnswerIds={ownedAnswerIds}
               onChanged={refreshAfterMutation}
               onSignInRequired={requireSignIn}
+              onVoteChange={handleVoteChange}
             />
           ))
         )}

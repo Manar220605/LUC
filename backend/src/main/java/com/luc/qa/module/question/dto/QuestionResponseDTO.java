@@ -6,8 +6,10 @@ import com.luc.qa.module.user.dto.PublicAuthorDTO;
 import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 public class QuestionResponseDTO {
 
@@ -23,4 +25,6 @@ public class QuestionResponseDTO {
     private int score;
     private Instant createdAt;
     private Instant updatedAt;
+    private Integer viewerVote;
+    private boolean ownedByCurrentUser;
 }

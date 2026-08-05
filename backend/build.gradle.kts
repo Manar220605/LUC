@@ -40,6 +40,9 @@ dependencies {
 
     implementation("org.keycloak:keycloak-admin-client:26.0.7")
 
+    implementation("org.springframework.retry:spring-retry:2.0.11")
+    implementation("org.springframework:spring-aspects")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:junit-jupiter")

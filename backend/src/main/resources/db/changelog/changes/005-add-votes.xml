@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="005-create-votes" author="luc">
+        <createTable tableName="votes">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="voter_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="votes"
+            baseColumnNames="voter_id"
+            constraintName="fk_votes_voter"
+            referencedTableName="users"
+            referencedColumnNames="id"/>
+
+        <addUniqueConstraint
+            tableName="votes"
+            columnNames="voter_id, target_type, target_id"
+            constraintName="uk_votes_voter_target"/>
+
+        <createIndex indexName="idx_votes_target" tableName="votes">
+            <column name="target_type"/>
+            <column name="target_id"/>
+        </createIndex>
+
+        <sql>
+            ALTER TABLE votes ADD CONSTRAINT chk_votes_value CHECK (value IN (-1, 1));
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

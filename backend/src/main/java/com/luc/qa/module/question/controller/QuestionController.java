@@ -6,6 +6,7 @@ import com.luc.qa.module.question.dto.UpdateQuestionRequestDTO;
 import com.luc.qa.module.question.entity.Question;
 import com.luc.qa.module.question.mapper.QuestionMapper;
 import com.luc.qa.module.question.service.QuestionService;
+import com.luc.qa.module.vote.service.VoteService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -13,8 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,11 +39,15 @@ public class QuestionController {
 
     private final QuestionService questionService;
     private final QuestionMapper questionMapper;
+    private final VoteService voteService;
 
     @GetMapping("/{id}")
     public QuestionResponseDTO get(@PathVariable Long id) {
         questionService.incrementView(id);
-        return questionMapper.toResponse(questionService.findById(id));
+        Question question = questionService.findById(id);
+        QuestionResponseDTO response = questionMapper.toResponse(question);
+        voteService.enrichQuestionResponse(response, question, resolveKeycloakId());
+        return response;
     }
 
     @PostMapping
@@ -71,5 +79,16 @@ public class QuestionController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
         questionService.softDelete(id, jwt.getSubject());
+    }
+
+    private String resolveKeycloakId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+            return jwtAuth.getToken().getSubject();
+        }
+        if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+            return jwt.getSubject();
+        }
+        return null;
     }
 }

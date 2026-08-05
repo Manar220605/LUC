@@ -26,6 +26,8 @@ public class AnswerTreeNodeDTO {
     @JsonProperty("ownedByCurrentUser")
     private boolean ownedByCurrentUser;
 
+    private Integer viewerVote;
+
     @Builder.Default
     private List<AnswerTreeNodeDTO> replies = new ArrayList<>();
 }

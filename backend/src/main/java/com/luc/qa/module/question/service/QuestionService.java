@@ -12,7 +12,7 @@ public interface QuestionService {
 
     Question findById(Long id);
 
-    Page<QuestionSummaryDTO> findFeed(QuestionFilterDTO filter, Pageable pageable);
+    Page<QuestionSummaryDTO> findFeed(QuestionFilterDTO filter, Pageable pageable, String keycloakId);
 
     Question create(CreateQuestionRequestDTO request, String keycloakId);
 
