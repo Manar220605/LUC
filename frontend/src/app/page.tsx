@@ -1,11 +1,18 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { apiPublicGet } from '@/lib/apiPublic';
-import FeedList from '@/components/question/FeedList';
+import FeedPanel from '@/components/question/FeedPanel';
+import { buildFeedQuery, parseFeedSort } from '@/lib/feed';
 import type { PageResponseDTO, QuestionSummaryDTO } from '@/lib/types';
 
-const feedQuery = '?sort=NEW&page=0&size=20';
+type Props = {
+  searchParams: Promise<{ sort?: string }>;
+};
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: Props) {
+  const params = await searchParams;
+  const sort = parseFeedSort(params.sort);
+  const feedQuery = buildFeedQuery({ sort });
   const feed = await apiPublicGet<PageResponseDTO<QuestionSummaryDTO>>(`/api/feed${feedQuery}`);
 
   return (
@@ -14,7 +21,7 @@ export default async function HomePage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Latest questions</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Browse the newest questions from across LUC communities.
+            Browse questions from across LUC communities.
           </p>
         </div>
         <Link
@@ -26,10 +33,9 @@ export default async function HomePage() {
       </div>
 
       <section className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900">New</h2>
-        <div className="mt-3">
-          <FeedList items={feed.content} feedQuery={feedQuery} />
-        </div>
+        <Suspense fallback={<p className="text-sm text-gray-500">Loading feed…</p>}>
+          <FeedPanel items={feed.content} sort={sort} />
+        </Suspense>
       </section>
     </main>
   );

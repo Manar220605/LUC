@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { apiPublicGet } from '@/lib/apiPublic';
 import type {
   CommunityResponseDTO,
@@ -7,16 +8,21 @@ import type {
 } from '@/lib/types';
 import CommunityBreadcrumb from '@/components/community/CommunityBreadcrumb';
 import CommunityTree from '@/components/community/CommunityTree';
-import FeedList from '@/components/question/FeedList';
+import FeedPanel from '@/components/question/FeedPanel';
+import { buildFeedQuery, parseFeedSort } from '@/lib/feed';
 
 type Props = {
   params: Promise<{ path: string[] }>;
+  searchParams: Promise<{ sort?: string; includeDescendants?: string }>;
 };
 
-export default async function CommunityPage({ params }: Props) {
+export default async function CommunityPage({ params, searchParams }: Props) {
   const { path: segments } = await params;
+  const query = await searchParams;
   const path = segments.join('/');
-  const feedQuery = `?community=${encodeURIComponent(path)}&includeDescendants=true&sort=NEW&page=0&size=20`;
+  const sort = parseFeedSort(query.sort);
+  const includeDescendants = query.includeDescendants !== 'false';
+  const feedQuery = buildFeedQuery({ sort, communityPath: path, includeDescendants });
 
   const [community, tree, feed] = await Promise.all([
     apiPublicGet<CommunityResponseDTO>(`/api/communities/by-path?path=${encodeURIComponent(path)}`),
@@ -43,11 +49,15 @@ export default async function CommunityPage({ params }: Props) {
       <section className="mt-8">
         <h2 className="text-lg font-semibold text-gray-900">Questions</h2>
         <div className="mt-3">
-          <FeedList
-            items={feed.content}
-            feedQuery={feedQuery}
-            emptyMessage="No questions in this community yet."
-          />
+          <Suspense fallback={<p className="text-sm text-gray-500">Loading feed…</p>}>
+            <FeedPanel
+              items={feed.content}
+              sort={sort}
+              communityPath={path}
+              includeDescendants={includeDescendants}
+              emptyMessage="No questions in this community yet."
+            />
+          </Suspense>
         </div>
       </section>
     </main>

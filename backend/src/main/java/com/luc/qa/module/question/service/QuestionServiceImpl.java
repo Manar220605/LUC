@@ -7,6 +7,7 @@ import com.luc.qa.common.exception.UserNotFoundException;
 import com.luc.qa.module.community.entity.Community;
 import com.luc.qa.module.community.repository.CommunityRepository;
 import com.luc.qa.module.feed.dto.FeedSort;
+import com.luc.qa.module.feed.service.FeedHotScore;
 import com.luc.qa.module.question.dto.CreateQuestionRequestDTO;
 import com.luc.qa.module.question.dto.QuestionFilterDTO;
 import com.luc.qa.module.question.dto.QuestionSummaryDTO;
@@ -19,6 +20,8 @@ import com.luc.qa.module.question.specification.QuestionSpecifications;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.repository.UserRepository;
 import com.luc.qa.module.vote.service.VoteService;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class QuestionServiceImpl implements QuestionService {
 
+    private static final int HOT_CANDIDATE_LIMIT = 200;
+
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
     private final CommunityRepository communityRepository;
@@ -52,6 +57,26 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     @Transactional(readOnly = true)
     public Page<QuestionSummaryDTO> findFeed(QuestionFilterDTO filter, Pageable pageable, String keycloakId) {
+        Specification<Question> spec = buildFeedSpecification(filter);
+        FeedSort sort = filter.getSort() != null ? filter.getSort() : FeedSort.NEW;
+
+        if (sort == FeedSort.HOT) {
+            return findHotFeed(spec, pageable, keycloakId);
+        }
+
+        Pageable sortedPageable = PageRequest.of(
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            sort == FeedSort.TOP
+                ? Sort.by(Sort.Direction.DESC, "score", "createdAt", "id")
+                : Sort.by(Sort.Direction.DESC, "createdAt", "id")
+        );
+
+        Page<Question> questions = questionRepository.findAll(spec, sortedPageable);
+        return toSummaryPage(questions, keycloakId);
+    }
+
+    private Specification<Question> buildFeedSpecification(QuestionFilterDTO filter) {
         Specification<Question> spec = Specification.where(
             QuestionSpecifications.hasStatus(QuestionStatus.OPEN)
         );
@@ -66,17 +91,45 @@ public class QuestionServiceImpl implements QuestionService {
             spec = spec.and(QuestionSpecifications.titleOrBodyContains(filter.getSearch()));
         }
 
-        Pageable sortedPageable = pageable;
-        FeedSort sort = filter.getSort() != null ? filter.getSort() : FeedSort.NEW;
-        if (sort == FeedSort.NEW || sort == FeedSort.HOT || sort == FeedSort.TOP) {
-            sortedPageable = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "createdAt")
-            );
-        }
+        return spec;
+    }
 
-        Page<Question> questions = questionRepository.findAll(spec, sortedPageable);
+    private Page<QuestionSummaryDTO> findHotFeed(
+        Specification<Question> spec,
+        Pageable pageable,
+        String keycloakId
+    ) {
+        Pageable recencyPage = PageRequest.of(
+            0,
+            HOT_CANDIDATE_LIMIT,
+            Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+        List<Question> candidates = questionRepository.findAll(spec, recencyPage).getContent();
+        Instant now = Instant.now();
+
+        List<Question> ranked = candidates.stream()
+            .sorted(Comparator
+                .comparingDouble((Question question) -> FeedHotScore.compute(question, now))
+                .reversed()
+                .thenComparing(Question::getCreatedAt, Comparator.reverseOrder())
+                .thenComparing(Question::getId, Comparator.reverseOrder()))
+            .toList();
+
+        int start = Math.toIntExact(pageable.getOffset());
+        int end = Math.min(start + pageable.getPageSize(), ranked.size());
+        List<Question> pageContent = start >= ranked.size() ? List.of() : ranked.subList(start, end);
+
+        long totalMatching = questionRepository.count(spec);
+        long totalElements = Math.min(totalMatching, HOT_CANDIDATE_LIMIT);
+
+        List<QuestionSummaryDTO> summaries = pageContent.stream()
+            .map(questionMapper::toSummary)
+            .toList();
+        voteService.enrichQuestionSummaries(summaries, pageContent, keycloakId);
+        return new PageImpl<>(summaries, pageable, totalElements);
+    }
+
+    private Page<QuestionSummaryDTO> toSummaryPage(Page<Question> questions, String keycloakId) {
         List<QuestionSummaryDTO> summaries = questions.getContent().stream()
             .map(questionMapper::toSummary)
             .toList();
