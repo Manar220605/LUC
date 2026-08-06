@@ -52,6 +52,93 @@ export type PublicAuthorDTO = {
   displayName: string;
   role?: UserRole;
   avatarUrl?: string | null;
+  gradYear?: number | null;
+  currentPosition?: string | null;
+};
+
+export type Faculty =
+  | 'LITERATURE_AND_HUMAN_SCIENCES'
+  | 'INFORMATION_AND_DOCUMENTATION'
+  | 'LAW_POLITICAL_AND_ADMINISTRATIVE_SCIENCES'
+  | 'ECONOMIC_SCIENCES_AND_BUSINESS_ADMINISTRATION'
+  | 'SCIENCES'
+  | 'EDUCATION'
+  | 'ENGINEERING'
+  | 'AGRICULTURE_AND_VETERINARY_SCIENCES'
+  | 'MEDICAL_SCIENCES'
+  | 'DENTISTRY'
+  | 'PHARMACY'
+  | 'PUBLIC_HEALTH'
+  | 'FINE_ARTS_AND_ARCHITECTURE'
+  | 'TOURISM_AND_HOSPITALITY_MANAGEMENT'
+  | 'SOCIAL_SCIENCES'
+  | 'TECHNOLOGY'
+  | 'INSTITUTE_OF_PHYSICAL_EDUCATION';
+
+export type Degree = 'BS' | 'MS' | 'PhD' | 'DIPLOMA';
+
+export type VerificationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export type SubmitVerificationRequestDTO = {
+  linkedinUrl: string;
+  claimedGradYear: number;
+  claimedFaculty: Faculty;
+  claimedDegree: Degree;
+  claimedMajor: string;
+  claimedPosition?: string;
+  claimedCompany?: string;
+};
+
+export type VerificationResponseDTO = {
+  id: number;
+  status: VerificationStatus;
+  linkedinUrl: string;
+  claimedGradYear: number;
+  claimedFaculty: Faculty;
+  claimedDegree: Degree;
+  claimedMajor: string;
+  claimedPosition: string | null;
+  claimedCompany: string | null;
+  submittedAt: string;
+  reviewedAt: string | null;
+  rejectionReason: string | null;
+};
+
+export type AlumniProfileResponseDTO = {
+  gradYear: number;
+  faculty: Faculty;
+  degree: Degree;
+  major: string;
+  currentPosition: string | null;
+  currentCompany: string | null;
+  linkedinUrl: string | null;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UpdateAlumniProfileRequestDTO = {
+  currentPosition?: string;
+  currentCompany?: string;
+  isPublic?: boolean;
+};
+
+export type AdminVerificationResponseDTO = {
+  id: number;
+  userId: number;
+  userDisplayName: string;
+  userEmail: string;
+  linkedinUrl: string;
+  claimedGradYear: number;
+  claimedFaculty: Faculty;
+  claimedDegree: Degree;
+  claimedMajor: string;
+  claimedPosition: string | null;
+  claimedCompany: string | null;
+  status: VerificationStatus;
+  submittedAt: string;
+  reviewedAt: string | null;
+  rejectionReason: string | null;
 };
 
 export type QuestionSummaryDTO = {

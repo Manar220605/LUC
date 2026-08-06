@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="006-create-alumni-profiles" author="luc">
+        <createTable tableName="alumni_profiles">
+            <column name="user_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="grad_year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="faculty" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="degree" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="major" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_position" type="VARCHAR(200)"/>
+            <column name="current_company" type="VARCHAR(200)"/>
+            <column name="linkedin_url" type="VARCHAR(500)"/>
+            <column name="is_public" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="alumni_profiles"
+            baseColumnNames="user_id"
+            constraintName="fk_alumni_profiles_user"
+            referencedTableName="users"
+            referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="006-create-alumni-verifications" author="luc">
+        <createTable tableName="alumni_verifications">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="linkedin_url" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="claimed_grad_year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="claimed_faculty" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="claimed_degree" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="claimed_major" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="claimed_position" type="VARCHAR(200)"/>
+            <column name="claimed_company" type="VARCHAR(200)"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="submitted_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reviewer_id" type="BIGINT"/>
+            <column name="reviewed_at" type="TIMESTAMP"/>
+            <column name="rejection_reason" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="alumni_verifications"
+            baseColumnNames="user_id"
+            constraintName="fk_alumni_verifications_user"
+            referencedTableName="users"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="alumni_verifications"
+            baseColumnNames="reviewer_id"
+            constraintName="fk_alumni_verifications_reviewer"
+            referencedTableName="users"
+            referencedColumnNames="id"/>
+
+        <createIndex indexName="idx_alumni_verifications_status" tableName="alumni_verifications">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_alumni_verifications_user" tableName="alumni_verifications">
+            <column name="user_id"/>
+        </createIndex>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_alumni_verifications_user_pending
+            ON alumni_verifications (user_id)
+            WHERE status = 'PENDING';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

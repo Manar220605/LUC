@@ -155,7 +155,7 @@
       "serviceAccountClientId": "luc-admin-client",
       "realmRoles": ["default-roles-luc"],
       "clientRoles": {
-        "realm-management": ["manage-users", "view-users"]
+        "realm-management": ["manage-users", "view-users", "view-realm"]
       }
     }
   ]

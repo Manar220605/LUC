@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="007-create-reports" author="luc">
+        <createTable tableName="reports">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="reporter_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reason" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="details" type="TEXT"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resolver_id" type="BIGINT"/>
+            <column name="resolved_at" type="TIMESTAMP"/>
+            <column name="resolution_note" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="reports"
+            baseColumnNames="reporter_id"
+            constraintName="fk_reports_reporter"
+            referencedTableName="users"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="reports"
+            baseColumnNames="resolver_id"
+            constraintName="fk_reports_resolver"
+            referencedTableName="users"
+            referencedColumnNames="id"/>
+
+        <createIndex indexName="idx_reports_status" tableName="reports">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_reports_target" tableName="reports">
+            <column name="target_type"/>
+            <column name="target_id"/>
+        </createIndex>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_reports_reporter_target_pending
+            ON reports (reporter_id, target_type, target_id)
+            WHERE status = 'PENDING';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

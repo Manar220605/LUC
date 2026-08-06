@@ -12,4 +12,6 @@ public class PublicAuthorDTO {
     private String displayName;
     private UserRole role;
     private String avatarUrl;
+    private Integer gradYear;
+    private String currentPosition;
 }

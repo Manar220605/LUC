@@ -1,6 +1,7 @@
 package com.luc.qa.module.user.repository;
 
 import com.luc.qa.module.user.entity.User;
+import com.luc.qa.module.user.entity.UserRole;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     boolean existsByStudentId(String studentId);
 
     boolean existsByStudentIdAndIdNot(String studentId, Long id);
+
+    long countByRole(UserRole role);
 }

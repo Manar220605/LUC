@@ -3,6 +3,8 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { getSession, signIn, useSession } from 'next-auth/react';
 import VoteControls from '@/components/vote/VoteControls';
+import ReportButton from '@/components/moderation/ReportButton';
+import AuthorBadge from '@/components/user/AuthorBadge';
 import type {
   AnswerResponseDTO,
   AnswerTreeNodeDTO,
@@ -396,7 +398,10 @@ function AnswerNode({
           )}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
-              <span className="font-medium text-gray-700">{answer.author.displayName}</span>
+              <span className="flex flex-wrap items-center gap-2 font-medium text-gray-700">
+                <span>{answer.author.displayName}</span>
+                <AuthorBadge author={answer.author} />
+              </span>
               <span>{new Date(answer.createdAt).toLocaleString()}</span>
               {answer.deleted && <span>{answer.score} score</span>}
             </div>
@@ -425,6 +430,18 @@ function AnswerNode({
             >
               Reply
             </button>
+          )}
+          {!answer.deleted && (
+            <>
+              <ReportButton targetType="ANSWER" targetId={answer.id} />
+              {answer.author.id != null && (
+                <ReportButton
+                  targetType="USER"
+                  targetId={answer.author.id}
+                  label="Report user"
+                />
+              )}
+            </>
           )}
           {isOwner && !editOpen && !answer.deleted && (
             <>

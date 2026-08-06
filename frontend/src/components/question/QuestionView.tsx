@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSession, useSession } from 'next-auth/react';
 import AnswerThread from '@/components/question/AnswerThread';
+import ReportButton from '@/components/moderation/ReportButton';
 import VoteControls from '@/components/vote/VoteControls';
+import AuthorBadge from '@/components/user/AuthorBadge';
 import type { QuestionResponseDTO } from '@/lib/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
@@ -104,8 +106,11 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
         <div className="min-w-0 flex-1">
           <h1 className="text-3xl font-bold text-gray-900">{question.title}</h1>
 
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
-            <span>{question.author.displayName}</span>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+            <span className="flex flex-wrap items-center gap-2">
+              <span>{question.author.displayName}</span>
+              <AuthorBadge author={question.author} />
+            </span>
             <span>{new Date(question.createdAt).toLocaleString()}</span>
             <span>{question.viewCount} views</span>
             <span>{answerCount} answers</span>
@@ -116,6 +121,17 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
       <article className="mt-6 whitespace-pre-wrap rounded-lg border border-gray-200 bg-white p-6 text-gray-800">
         {question.body}
       </article>
+
+      <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
+        <ReportButton targetType="QUESTION" targetId={question.id} />
+        {question.author.id != null && (
+          <ReportButton
+            targetType="USER"
+            targetId={question.author.id}
+            label="Report user"
+          />
+        )}
+      </div>
 
       <AnswerThread
         questionId={questionId}
