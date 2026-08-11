@@ -4,6 +4,7 @@ import com.luc.qa.common.pagination.PageResponseDTO;
 import com.luc.qa.module.user.dto.AdminUserFilterDTO;
 import com.luc.qa.module.user.dto.AdminUserResponseDTO;
 import com.luc.qa.module.user.dto.BanUserRequestDTO;
+import com.luc.qa.module.user.dto.UpdateUserRoleRequestDTO;
 import com.luc.qa.module.user.mapper.UserMapper;
 import com.luc.qa.module.user.service.AdminUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,5 +59,13 @@ public class AdminUserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void unban(@PathVariable Long id) {
         adminUserService.unbanUser(id);
+    }
+
+    @PutMapping("/{id}/role")
+    public AdminUserResponseDTO updateRole(
+        @PathVariable Long id,
+        @Valid @RequestBody UpdateUserRoleRequestDTO request
+    ) {
+        return userMapper.toAdminResponse(adminUserService.updateRole(id, request.getRole()));
     }
 }

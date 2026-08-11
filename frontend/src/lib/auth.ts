@@ -5,6 +5,21 @@ import type { JWT } from 'next-auth/jwt';
 const issuer = process.env.KEYCLOAK_ISSUER!;
 const internalUrl = process.env.KEYCLOAK_INTERNAL_URL?.replace(/\/$/, '');
 
+function extractRoles(accessToken: string | undefined): string[] {
+  if (!accessToken) return [];
+  const parts = accessToken.split('.');
+  if (parts.length < 2) return [];
+  try {
+    const payload = JSON.parse(
+      Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8')
+    );
+    const roles = payload?.realm_access?.roles;
+    return Array.isArray(roles) ? roles : [];
+  } catch {
+    return [];
+  }
+}
+
 function keycloakTokenEndpoint(): string {
   const realmPath = new URL(issuer).pathname;
   const publicBase = issuer.slice(0, issuer.length - realmPath.length);
@@ -57,6 +72,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       accessToken: refreshed.access_token,
       accessTokenExpires: Date.now() + refreshed.expires_in * 1000,
       refreshToken: refreshed.refresh_token ?? token.refreshToken,
+      roles: extractRoles(refreshed.access_token),
       error: undefined,
     };
   } catch (error) {
@@ -85,6 +101,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             ? account.expires_at * 1000
             : Date.now() + (account.expires_in ?? 300) * 1000,
           idToken: account.id_token,
+          roles: extractRoles(account.access_token),
         };
       }
 
@@ -108,6 +125,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return session;
       }
       session.accessToken = token.accessToken;
+      session.roles = token.roles;
       return session;
     },
   },

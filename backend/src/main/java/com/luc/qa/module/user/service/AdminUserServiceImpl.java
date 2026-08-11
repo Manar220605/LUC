@@ -5,9 +5,11 @@ import com.luc.qa.common.keycloak.KeycloakAdminClient;
 import com.luc.qa.common.pagination.PageResponseDTO;
 import com.luc.qa.module.user.dto.AdminUserFilterDTO;
 import com.luc.qa.module.user.entity.User;
+import com.luc.qa.module.user.entity.UserRole;
 import com.luc.qa.module.user.repository.UserRepository;
 import com.luc.qa.module.user.specification.UserSpecifications;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserRepository userRepository;
@@ -56,6 +59,28 @@ public class AdminUserServiceImpl implements AdminUserService {
         user.setBanReason(null);
         User saved = userRepository.save(user);
         keycloakAdminClient.enableUser(user.getKeycloakId());
+        return saved;
+    }
+
+    @Override
+    public User updateRole(Long id, UserRole role) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
+        UserRole previous = user.getRole();
+        if (previous == role) {
+            return user;
+        }
+        user.setRole(role);
+        User saved = userRepository.save(user);
+        try {
+            if (previous != null) {
+                keycloakAdminClient.removeRealmRole(user.getKeycloakId(), previous.name());
+            }
+            keycloakAdminClient.assignRealmRole(user.getKeycloakId(), role.name());
+        } catch (RuntimeException e) {
+            log.warn("Failed to sync Keycloak role for user {} ({}). Local role updated to {}. {}",
+                user.getId(), user.getEmail(), role, e.getMessage());
+        }
         return saved;
     }
 }

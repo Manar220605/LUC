@@ -7,6 +7,7 @@ import { useState } from 'react';
 export default function Header() {
   const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
+  const isAdmin = session?.roles?.includes('ADMIN') ?? false;
 
   return (
     <header className="border-b border-gray-200 bg-white">
@@ -35,6 +36,15 @@ export default function Header() {
                 >
                   Profile
                 </Link>
+                {isAdmin && (
+                  <Link
+                    href="/admin/dashboard"
+                    className="block px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50"
+                    onClick={() => setOpen(false)}
+                  >
+                    Admin panel
+                  </Link>
+                )}
                 <button
                   type="button"
                   className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
