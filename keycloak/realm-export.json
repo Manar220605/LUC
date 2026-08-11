@@ -131,6 +131,28 @@
       "webOrigins": []
     }
   ],
+  "identityProviders": [
+    {
+      "alias": "linkedin",
+      "displayName": "LinkedIn",
+      "providerId": "linkedin-openid-connect",
+      "enabled": true,
+      "storeToken": false,
+      "addReadTokenRoleOnCreate": false,
+      "trustEmail": true,
+      "linkOnly": false,
+      "firstBrokerLoginFlowAlias": "first broker login",
+      "config": {
+        "clientId": "${KEYCLOAK_LINKEDIN_CLIENT_ID}",
+        "clientSecret": "${KEYCLOAK_LINKEDIN_CLIENT_SECRET}",
+        "defaultScope": "openid profile email",
+        "clientAuthMethod": "client_secret_post",
+        "syncMode": "IMPORT",
+        "acceptsPromptNoneForwardFromClient": "false",
+        "backchannelSupported": "false"
+      }
+    }
+  ],
   "users": [
     {
       "username": "admin",
