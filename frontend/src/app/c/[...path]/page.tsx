@@ -2,12 +2,10 @@ import { Suspense } from 'react';
 import { apiPublicGet } from '@/lib/apiPublic';
 import type {
   CommunityResponseDTO,
-  CommunityTreeNodeDTO,
   PageResponseDTO,
   QuestionSummaryDTO,
 } from '@/lib/types';
 import CommunityBreadcrumb from '@/components/community/CommunityBreadcrumb';
-import CommunityTree from '@/components/community/CommunityTree';
 import FeedPanel from '@/components/question/FeedPanel';
 import { buildFeedQuery, parseFeedSort } from '@/lib/feed';
 
@@ -24,9 +22,8 @@ export default async function CommunityPage({ params, searchParams }: Props) {
   const includeDescendants = query.includeDescendants !== 'false';
   const feedQuery = buildFeedQuery({ sort, communityPath: path, includeDescendants });
 
-  const [community, tree, feed] = await Promise.all([
+  const [community, feed] = await Promise.all([
     apiPublicGet<CommunityResponseDTO>(`/api/communities/by-path?path=${encodeURIComponent(path)}`),
-    apiPublicGet<CommunityTreeNodeDTO[]>('/api/communities'),
     apiPublicGet<PageResponseDTO<QuestionSummaryDTO>>(`/api/feed${feedQuery}`),
   ]);
 
@@ -38,13 +35,6 @@ export default async function CommunityPage({ params, searchParams }: Props) {
         <p className="mt-2 text-gray-600">{community.description}</p>
       )}
       <p className="mt-1 text-sm text-gray-500">Path: {community.path}</p>
-
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900">Browse communities</h2>
-        <div className="mt-3 rounded-lg border border-gray-200 bg-white p-4">
-          <CommunityTree nodes={tree} currentPath={path} />
-        </div>
-      </section>
 
       <section className="mt-8">
         <h2 className="text-lg font-semibold text-gray-900">Questions</h2>
