@@ -28,10 +28,11 @@ public class FeedController {
         @RequestParam(defaultValue = "NEW") FeedSort sort,
         @RequestParam(required = false) String community,
         @RequestParam(defaultValue = "true") boolean includeDescendants,
+        @RequestParam(required = false) String search,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size
     ) {
-        return feedService.getFeed(sort, community, includeDescendants, page, size, resolveKeycloakId());
+        return feedService.getFeed(sort, community, includeDescendants, search, page, size, resolveKeycloakId());
     }
 
     private String resolveKeycloakId() {

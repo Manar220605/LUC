@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth';
+import { ApiError } from '@/lib/apiError';
 
 const API_URL =
   process.env.API_URL ??
@@ -18,7 +19,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     cache: 'no-store',
   });
   if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
+    throw await ApiError.fromResponse(res);
   }
   if (res.status === 204) {
     return undefined as T;

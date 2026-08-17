@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getSession, signIn } from 'next-auth/react';
+import { ApiError, getErrorMessage, SIGN_IN_REQUIRED } from '@/lib/apiError';
 import type { VoteResponseDTO, VoteTargetType } from '@/lib/vote';
 import { nextVoteState } from '@/lib/vote';
 
@@ -24,7 +25,7 @@ async function castVote(
 ): Promise<VoteResponseDTO> {
   const session = await getSession();
   if (session?.error === 'RefreshAccessTokenError' || !session?.accessToken) {
-    throw new Error('SIGN_IN_REQUIRED');
+    throw new Error(SIGN_IN_REQUIRED);
   }
 
   const res = await fetch(`${API_URL}/api/votes`, {
@@ -37,7 +38,7 @@ async function castVote(
   });
 
   if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
+    throw await ApiError.fromResponse(res);
   }
 
   return res.json() as Promise<VoteResponseDTO>;
@@ -92,11 +93,11 @@ export default function VoteControls({
     } catch (err) {
       setScore(previousScore);
       setViewerVote(previousVote);
-      if (err instanceof Error && err.message === 'SIGN_IN_REQUIRED') {
+      if (err instanceof Error && err.message === SIGN_IN_REQUIRED) {
         signIn('keycloak', { callbackUrl: window.location.href });
         return;
       }
-      setError(err instanceof Error ? err.message : 'Vote failed');
+      setError(getErrorMessage(err, 'Vote failed'));
     } finally {
       setSubmitting(false);
     }

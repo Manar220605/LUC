@@ -1,34 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { clientApiRequest } from '@/lib/clientApi';
+import { getErrorMessage, isApiError } from '@/lib/apiError';
 import { DASHBOARD_METRICS, type DashboardMetricsResponseDTO } from '@/lib/dashboard';
-import type { UserResponseDTO } from '@/lib/types';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
-
-async function fetchWithAuth<T>(path: string): Promise<{ status: number; data?: T }> {
-  const session = await getSession();
-  if (session?.error === 'RefreshAccessTokenError') {
-    throw new Error('Session expired; please sign in again');
-  }
-  const token = session?.accessToken;
-  const res = await fetch(`${API_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    cache: 'no-store',
-  });
-
-  if (res.status === 204) {
-    return { status: res.status };
-  }
-
-  const data = (await res.json()) as T;
-  return { status: res.status, data };
-}
 
 export default function AdminDashboardPage() {
   const { status } = useSession();
@@ -44,34 +21,20 @@ export default function AdminDashboardPage() {
     setForbidden(false);
 
     try {
-      const profileResult = await fetchWithAuth<UserResponseDTO>('/api/me');
-      if (profileResult.status === 401) {
+      const data = await clientApiRequest<DashboardMetricsResponseDTO>('/api/admin/dashboard');
+      setMetrics(data);
+    } catch (err) {
+      if (isApiError(err, 401)) {
         router.push('/auth/signin');
         return;
       }
-      if (profileResult.status !== 200 || !profileResult.data) {
-        throw new Error(`API ${profileResult.status}: Failed to load profile`);
-      }
-      if (profileResult.data.role !== 'ADMIN') {
+      if (isApiError(err, 403)) {
         setForbidden(true);
         setMetrics(null);
         return;
       }
-
-      const metricsResult = await fetchWithAuth<DashboardMetricsResponseDTO>('/api/admin/dashboard');
-      if (metricsResult.status === 403) {
-        setForbidden(true);
-        setMetrics(null);
-        return;
-      }
-      if (metricsResult.status !== 200 || !metricsResult.data) {
-        throw new Error(`API ${metricsResult.status}: Failed to load dashboard metrics`);
-      }
-
-      setMetrics(metricsResult.data);
-    } catch (err) {
       setMetrics(null);
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+      setError(getErrorMessage(err, 'Failed to load dashboard'));
     } finally {
       setLoading(false);
     }

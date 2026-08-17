@@ -1,13 +1,18 @@
 package com.luc.qa.module.question.service;
 
+import com.luc.qa.common.exception.AnswerNotFoundException;
+import com.luc.qa.common.exception.BadRequestException;
 import com.luc.qa.common.exception.CommunityNotFoundException;
 import com.luc.qa.common.exception.ForbiddenException;
 import com.luc.qa.common.exception.QuestionNotFoundException;
 import com.luc.qa.common.exception.UserNotFoundException;
+import com.luc.qa.module.answer.entity.Answer;
+import com.luc.qa.module.answer.repository.AnswerRepository;
 import com.luc.qa.module.community.entity.Community;
 import com.luc.qa.module.community.repository.CommunityRepository;
 import com.luc.qa.module.feed.dto.FeedSort;
 import com.luc.qa.module.feed.service.FeedHotScore;
+import com.luc.qa.module.notification.service.NotificationService;
 import com.luc.qa.module.question.dto.CreateQuestionRequestDTO;
 import com.luc.qa.module.question.dto.QuestionFilterDTO;
 import com.luc.qa.module.question.dto.QuestionSummaryDTO;
@@ -20,6 +25,7 @@ import com.luc.qa.module.question.specification.QuestionSpecifications;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.repository.UserRepository;
 import com.luc.qa.module.vote.service.VoteService;
+import com.luc.qa.module.vote.entity.VoteTargetType;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -42,10 +48,12 @@ public class QuestionServiceImpl implements QuestionService {
     private static final int HOT_CANDIDATE_LIMIT = 200;
 
     private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
     private final CommunityRepository communityRepository;
     private final QuestionMapper questionMapper;
     private final VoteService voteService;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -57,8 +65,23 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     @Transactional(readOnly = true)
     public Page<QuestionSummaryDTO> findFeed(QuestionFilterDTO filter, Pageable pageable, String keycloakId) {
-        Specification<Question> spec = buildFeedSpecification(filter);
         FeedSort sort = filter.getSort() != null ? filter.getSort() : FeedSort.NEW;
+        boolean hasSearch = filter.getSearch() != null && !filter.getSearch().isBlank();
+
+        if (hasSearch) {
+            if (sort == FeedSort.HOT) {
+                return findHotFullTextFeed(filter, pageable, keycloakId);
+            }
+
+            Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+            );
+            Page<Question> questions = questionRepository.findByFullTextSearch(filter, sortedPageable);
+            return toSummaryPage(questions, keycloakId);
+        }
+
+        Specification<Question> spec = buildFeedSpecification(filter);
 
         if (sort == FeedSort.HOT) {
             return findHotFeed(spec, pageable, keycloakId);
@@ -76,6 +99,39 @@ public class QuestionServiceImpl implements QuestionService {
         return toSummaryPage(questions, keycloakId);
     }
 
+    private Page<QuestionSummaryDTO> findHotFullTextFeed(
+        QuestionFilterDTO filter,
+        Pageable pageable,
+        String keycloakId
+    ) {
+        List<Question> candidates = questionRepository.findHotCandidatesByFullTextSearch(
+            filter,
+            HOT_CANDIDATE_LIMIT
+        );
+        Instant now = Instant.now();
+
+        List<Question> ranked = candidates.stream()
+            .sorted(Comparator
+                .comparingDouble((Question question) -> FeedHotScore.compute(question, now))
+                .reversed()
+                .thenComparing(Question::getCreatedAt, Comparator.reverseOrder())
+                .thenComparing(Question::getId, Comparator.reverseOrder()))
+            .toList();
+
+        int start = Math.toIntExact(pageable.getOffset());
+        int end = Math.min(start + pageable.getPageSize(), ranked.size());
+        List<Question> pageContent = start >= ranked.size() ? List.of() : ranked.subList(start, end);
+
+        long totalMatching = questionRepository.countByFullTextSearch(filter);
+        long totalElements = Math.min(totalMatching, HOT_CANDIDATE_LIMIT);
+
+        List<QuestionSummaryDTO> summaries = pageContent.stream()
+            .map(questionMapper::toSummary)
+            .toList();
+        voteService.enrichQuestionSummaries(summaries, pageContent, keycloakId);
+        return new PageImpl<>(summaries, pageable, totalElements);
+    }
+
     private Specification<Question> buildFeedSpecification(QuestionFilterDTO filter) {
         Specification<Question> spec = Specification.where(
             QuestionSpecifications.hasStatus(QuestionStatus.OPEN)
@@ -85,10 +141,6 @@ public class QuestionServiceImpl implements QuestionService {
             spec = spec.and(filter.isIncludeDescendants()
                 ? QuestionSpecifications.inCommunityOrDescendants(filter.getCommunityPath())
                 : QuestionSpecifications.inCommunityExact(filter.getCommunityPath()));
-        }
-
-        if (filter.getSearch() != null && !filter.getSearch().isBlank()) {
-            spec = spec.and(QuestionSpecifications.titleOrBodyContains(filter.getSearch()));
         }
 
         return spec;
@@ -156,6 +208,14 @@ public class QuestionServiceImpl implements QuestionService {
 
         Question saved = questionRepository.save(question);
         communityRepository.incrementQuestionCount(community.getId());
+        notificationService.notifyMentions(
+            author,
+            request.getBody(),
+            saved,
+            VoteTargetType.QUESTION,
+            saved.getId(),
+            request.isAnonymous()
+        );
         return saved;
     }
 
@@ -165,7 +225,16 @@ public class QuestionServiceImpl implements QuestionService {
         question.setTitle(request.getTitle().trim());
         question.setBody(request.getBody());
         question.setAnonymous(request.isAnonymous());
-        return questionRepository.save(question);
+        Question saved = questionRepository.save(question);
+        notificationService.notifyMentions(
+            question.getAuthor(),
+            request.getBody(),
+            saved,
+            VoteTargetType.QUESTION,
+            saved.getId(),
+            request.isAnonymous()
+        );
+        return saved;
     }
 
     @Override
@@ -178,6 +247,33 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void incrementView(Long id) {
         questionRepository.incrementViewCount(id);
+    }
+
+    @Override
+    public Question acceptAnswer(Long questionId, Long answerId, String keycloakId) {
+        Question question = findOwnedQuestion(questionId, keycloakId);
+        Answer answer = answerRepository.findById(answerId)
+            .orElseThrow(() -> new AnswerNotFoundException(answerId));
+
+        if (!answer.getQuestion().getId().equals(question.getId())) {
+            throw new BadRequestException("Answer does not belong to this question");
+        }
+        if (answer.isDeleted()) {
+            throw new BadRequestException("Cannot accept a deleted answer");
+        }
+        if (answer.getParentAnswer() != null) {
+            throw new BadRequestException("Only top-level answers can be accepted");
+        }
+
+        question.setAcceptedAnswer(answer);
+        return questionRepository.save(question);
+    }
+
+    @Override
+    public Question unacceptAnswer(Long questionId, String keycloakId) {
+        Question question = findOwnedQuestion(questionId, keycloakId);
+        question.setAcceptedAnswer(null);
+        return questionRepository.save(question);
     }
 
     private Question findOwnedQuestion(Long id, String keycloakId) {

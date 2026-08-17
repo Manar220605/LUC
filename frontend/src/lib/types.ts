@@ -170,6 +170,7 @@ export type QuestionResponseDTO = {
   updatedAt: string;
   viewerVote?: number | null;
   ownedByCurrentUser?: boolean;
+  acceptedAnswerId?: number | null;
 };
 
 export type PageResponseDTO<T> = {
@@ -178,6 +179,40 @@ export type PageResponseDTO<T> = {
   size: number;
   totalElements: number;
   totalPages: number;
+};
+
+export type NotificationType =
+  | 'ANSWER_ON_QUESTION'
+  | 'UPVOTE'
+  | 'MENTION';
+
+export type NotificationResponseDTO = {
+  id: number;
+  type: NotificationType;
+  message: string;
+  actor: PublicAuthorDTO;
+  targetType?: 'QUESTION' | 'ANSWER' | null;
+  targetId?: number | null;
+  questionId?: number | null;
+  read: boolean;
+  createdAt: string;
+};
+
+export type UnreadCountResponseDTO = {
+  count: number;
+};
+
+export type RegisterStudentRequestDTO = {
+  fileNumber: string;
+  email: string;
+};
+
+export type RegisterStudentResponseDTO = {
+  message: string;
+  fullName: string;
+  enrollmentYear: number;
+  faculty: string;
+  major: string;
 };
 
 export type CreateQuestionRequestDTO = {
@@ -197,6 +232,7 @@ export type AnswerTreeNodeDTO = {
   createdAt: string;
   updatedAt: string;
   ownedByCurrentUser: boolean;
+  accepted?: boolean;
   viewerVote?: number | null;
   replies: AnswerTreeNodeDTO[];
 };

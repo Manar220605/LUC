@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="012-create-student-directory" author="luc">
+        <createTable tableName="student_directory">
+            <column name="file_number" type="VARCHAR(20)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enrollment_year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="faculty" type="VARCHAR(80)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="major" type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registered_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <insert tableName="student_directory">
+            <column name="file_number" value="2024001"/>
+            <column name="email" value="karim.student@lu.edu.lb"/>
+            <column name="first_name" value="Karim"/>
+            <column name="last_name" value="Haddad"/>
+            <column name="enrollment_year" valueNumeric="2024"/>
+            <column name="faculty" value="ENGINEERING"/>
+            <column name="major" value="Computer Science"/>
+        </insert>
+        <insert tableName="student_directory">
+            <column name="file_number" value="2024002"/>
+            <column name="email" value="sara.student@lu.edu.lb"/>
+            <column name="first_name" value="Sara"/>
+            <column name="last_name" value="Khalil"/>
+            <column name="enrollment_year" valueNumeric="2023"/>
+            <column name="faculty" value="SCIENCES"/>
+            <column name="major" value="Mathematics"/>
+        </insert>
+        <insert tableName="student_directory">
+            <column name="file_number" value="2023015"/>
+            <column name="email" value="omar.student@lu.edu.lb"/>
+            <column name="first_name" value="Omar"/>
+            <column name="last_name" value="Fares"/>
+            <column name="enrollment_year" valueNumeric="2023"/>
+            <column name="faculty" value="LITERATURE_AND_HUMAN_SCIENCES"/>
+            <column name="major" value="English Language"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

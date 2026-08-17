@@ -1,6 +1,7 @@
 package com.luc.qa.module.question.entity;
 
 import com.luc.qa.common.entity.AuditableEntity;
+import com.luc.qa.module.answer.entity.Answer;
 import com.luc.qa.module.community.entity.Community;
 import com.luc.qa.module.user.entity.User;
 import jakarta.persistence.Column;
@@ -54,6 +55,10 @@ public class Question extends AuditableEntity {
     @Column(name = "answer_count", nullable = false)
     @Builder.Default
     private int answerCount = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "accepted_answer_id")
+    private Answer acceptedAnswer;
 
     @Column(nullable = false)
     @Builder.Default

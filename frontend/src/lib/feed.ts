@@ -13,6 +13,7 @@ export function buildFeedQuery(options: {
   sort: FeedSort;
   communityPath?: string;
   includeDescendants?: boolean;
+  search?: string;
   page?: number;
   size?: number;
 }): string {
@@ -23,6 +24,9 @@ export function buildFeedQuery(options: {
   if (options.communityPath) {
     params.set('community', options.communityPath);
     params.set('includeDescendants', String(options.includeDescendants ?? true));
+  }
+  if (options.search?.trim()) {
+    params.set('search', options.search.trim());
   }
   return `?${params.toString()}`;
 }

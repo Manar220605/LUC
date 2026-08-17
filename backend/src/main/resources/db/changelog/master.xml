@@ -12,5 +12,10 @@
     <include file="changes/005-add-votes.xml" relativeToChangelogFile="true"/>
     <include file="changes/006-add-alumni.xml" relativeToChangelogFile="true"/>
     <include file="changes/007-add-reports.xml" relativeToChangelogFile="true"/>
+    <include file="changes/008-add-questions-fulltext-search.xml" relativeToChangelogFile="true"/>
+    <include file="changes/009-add-accepted-answer.xml" relativeToChangelogFile="true"/>
+    <include file="changes/010-add-notifications.xml" relativeToChangelogFile="true"/>
+    <include file="changes/011-rename-upvote-notification-type.xml" relativeToChangelogFile="true"/>
+    <include file="changes/012-add-student-directory.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

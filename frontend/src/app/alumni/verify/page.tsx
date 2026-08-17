@@ -1,8 +1,10 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { clientApiRequest } from '@/lib/clientApi';
+import { getErrorMessage, isApiError } from '@/lib/apiError';
 import { DEGREES, FACULTIES, degreeLabel, facultyLabel } from '@/lib/alumni';
 import type {
   AlumniProfileResponseDTO,
@@ -13,36 +15,14 @@ import type {
   VerificationResponseDTO,
 } from '@/lib/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
-
-async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const session = await getSession();
-  if (session?.error === 'RefreshAccessTokenError') {
-    throw new Error('Session expired; please sign in again');
-  }
-  const token = session?.accessToken;
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...init.headers,
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
-  }
-  if (res.status === 204) {
-    return undefined as T;
-  }
-  return res.json();
-}
-
 async function loadOptional<T>(path: string): Promise<T | null> {
   try {
-    return await apiRequest<T>(path);
-  } catch {
-    return null;
+    return await clientApiRequest<T>(path);
+  } catch (err) {
+    if (isApiError(err, 404)) {
+      return null;
+    }
+    throw err;
   }
 }
 
@@ -84,7 +64,7 @@ export default function AlumniVerifyPage() {
         setIsPublic(profileData.isPublic);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load alumni data');
+      setError(getErrorMessage(err, 'Failed to load alumni data'));
     } finally {
       setLoading(false);
     }
@@ -119,13 +99,13 @@ export default function AlumniVerifyPage() {
         claimedPosition: claimedPosition.trim() || undefined,
         claimedCompany: claimedCompany.trim() || undefined,
       };
-      const created = await apiRequest<VerificationResponseDTO>('/api/alumni/verifications', {
+      const created = await clientApiRequest<VerificationResponseDTO>('/api/alumni/verifications', {
         method: 'POST',
         body: JSON.stringify(body),
       });
       setVerification(created);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Submission failed');
+      setError(getErrorMessage(err, 'Submission failed'));
     } finally {
       setSubmitting(false);
     }
@@ -141,13 +121,13 @@ export default function AlumniVerifyPage() {
         currentCompany: currentCompany.trim() || undefined,
         isPublic,
       };
-      const updated = await apiRequest<AlumniProfileResponseDTO>('/api/alumni/profiles/me', {
+      const updated = await clientApiRequest<AlumniProfileResponseDTO>('/api/alumni/profiles/me', {
         method: 'PUT',
         body: JSON.stringify(body),
       });
       setProfile(updated);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Profile update failed');
+      setError(getErrorMessage(err, 'Profile update failed'));
     } finally {
       setSavingProfile(false);
     }

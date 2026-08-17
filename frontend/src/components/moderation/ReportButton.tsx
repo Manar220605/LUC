@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from 'react';
 import { getSession, signIn } from 'next-auth/react';
+import { clientApiRequest } from '@/lib/clientApi';
+import { getErrorMessage, SIGN_IN_REQUIRED } from '@/lib/apiError';
 import {
   REPORT_REASONS,
   type CreateReportRequestDTO,
@@ -9,30 +11,6 @@ import {
   type ReportResponseDTO,
   type ReportTargetType,
 } from '@/lib/report';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
-
-type ApiErrorBody = {
-  message?: string;
-  error?: string;
-  details?: string[] | null;
-};
-
-async function readApiError(res: Response): Promise<string> {
-  const text = await res.text();
-  try {
-    const body = JSON.parse(text) as ApiErrorBody;
-    if (body.message) {
-      return body.message;
-    }
-    if (body.error) {
-      return body.error;
-    }
-  } catch {
-    // fall through to raw text
-  }
-  return text || `Request failed (${res.status})`;
-}
 
 type Props = {
   targetType: ReportTargetType;
@@ -44,23 +22,13 @@ type Props = {
 async function submitReport(payload: CreateReportRequestDTO): Promise<ReportResponseDTO> {
   const session = await getSession();
   if (session?.error === 'RefreshAccessTokenError' || !session?.accessToken) {
-    throw new Error('SIGN_IN_REQUIRED');
+    throw new Error(SIGN_IN_REQUIRED);
   }
 
-  const res = await fetch(`${API_URL}/api/reports`, {
+  return clientApiRequest<ReportResponseDTO>('/api/reports', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${session.accessToken}`,
-    },
     body: JSON.stringify(payload),
   });
-
-  if (!res.ok) {
-    throw new Error(await readApiError(res));
-  }
-
-  return res.json() as Promise<ReportResponseDTO>;
 }
 
 export default function ReportButton({
@@ -104,11 +72,11 @@ export default function ReportButton({
       setDetails('');
       setReason('SPAM');
     } catch (err) {
-      if (err instanceof Error && err.message === 'SIGN_IN_REQUIRED') {
+      if (err instanceof Error && err.message === SIGN_IN_REQUIRED) {
         signIn('keycloak', { callbackUrl: window.location.href });
         return;
       }
-      setError(err instanceof Error ? err.message : 'Failed to submit report');
+      setError(getErrorMessage(err, 'Failed to submit report'));
     } finally {
       setSubmitting(false);
     }

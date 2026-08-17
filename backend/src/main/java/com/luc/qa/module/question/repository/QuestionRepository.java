@@ -14,9 +14,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface QuestionRepository
-    extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
+    extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question>, QuestionRepositoryCustom {
 
-    @EntityGraph(attributePaths = {"author", "community", "community.parent"})
+    @EntityGraph(attributePaths = {"author", "community", "community.parent", "acceptedAnswer"})
     Optional<Question> findByIdAndStatusNot(Long id, QuestionStatus status);
 
     @EntityGraph(attributePaths = {"author", "community"})

@@ -21,4 +21,8 @@ public interface QuestionService {
     void softDelete(Long id, String keycloakId);
 
     void incrementView(Long id);
+
+    Question acceptAnswer(Long questionId, Long answerId, String keycloakId);
+
+    Question unacceptAnswer(Long questionId, String keycloakId);
 }

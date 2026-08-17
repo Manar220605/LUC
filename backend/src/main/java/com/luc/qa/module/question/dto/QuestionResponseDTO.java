@@ -27,4 +27,5 @@ public class QuestionResponseDTO {
     private Instant updatedAt;
     private Integer viewerVote;
     private boolean ownedByCurrentUser;
+    private Long acceptedAnswerId;
 }

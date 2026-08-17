@@ -1,11 +1,11 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import type { PageResponseDTO, UserRole, UserResponseDTO } from '@/lib/types';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+import { clientApiRequest } from '@/lib/clientApi';
+import { getErrorMessage, isApiError } from '@/lib/apiError';
+import type { PageResponseDTO, UserRole } from '@/lib/types';
 
 type AdminUserResponseDTO = {
   id: number;
@@ -32,33 +32,6 @@ const BANNED_OPTIONS: { value: '' | 'true' | 'false'; label: string }[] = [
   { value: 'true', label: 'Banned' },
 ];
 
-async function fetchWithAuth<T>(
-  path: string,
-  init: RequestInit = {}
-): Promise<{ status: number; data?: T }> {
-  const session = await getSession();
-  if (session?.error === 'RefreshAccessTokenError') {
-    throw new Error('Session expired; please sign in again');
-  }
-  const token = session?.accessToken;
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...init.headers,
-    },
-  });
-  if (res.status === 204) {
-    return { status: res.status };
-  }
-  if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
-  }
-  const data = (await res.json()) as T;
-  return { status: res.status, data };
-}
-
 export default function AdminUsersPage() {
   const { status } = useSession();
   const router = useRouter();
@@ -84,35 +57,27 @@ export default function AdminUsersPage() {
     setError(null);
     setForbidden(false);
     try {
-      const profile = await fetchWithAuth<UserResponseDTO>('/api/me');
-      if (profile.status === 401) {
-        router.push('/auth/signin');
-        return;
-      }
-      if (profile.data?.role !== 'ADMIN') {
-        setForbidden(true);
-        setItems([]);
-        return;
-      }
-
       const params = new URLSearchParams({ page: String(page), size: '20' });
       if (search.trim()) params.set('search', search.trim());
       if (roleFilter) params.set('role', roleFilter);
       if (bannedFilter) params.set('isBanned', bannedFilter);
 
-      const result = await fetchWithAuth<PageResponseDTO<AdminUserResponseDTO>>(
+      const result = await clientApiRequest<PageResponseDTO<AdminUserResponseDTO>>(
         `/api/admin/users?${params.toString()}`
       );
-      if (result.status === 403) {
-        setForbidden(true);
+      setItems(result.content);
+      setTotalPages(result.totalPages);
+    } catch (err) {
+      if (isApiError(err, 401)) {
+        router.push('/auth/signin');
         return;
       }
-      if (result.data) {
-        setItems(result.data.content);
-        setTotalPages(result.data.totalPages);
+      if (isApiError(err, 403)) {
+        setForbidden(true);
+        setItems([]);
+        return;
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load users');
+      setError(getErrorMessage(err, 'Failed to load users'));
     } finally {
       setLoading(false);
     }
@@ -139,7 +104,7 @@ export default function AdminUsersPage() {
     if (banTargetId == null || !banReason.trim()) return;
     setActionId(banTargetId);
     try {
-      await fetchWithAuth(`/api/admin/users/${banTargetId}/ban`, {
+      await clientApiRequest(`/api/admin/users/${banTargetId}/ban`, {
         method: 'PUT',
         body: JSON.stringify({ reason: banReason.trim() }),
       });
@@ -147,7 +112,7 @@ export default function AdminUsersPage() {
       setBanReason('');
       await loadUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ban failed');
+      setError(getErrorMessage(err, 'Ban failed'));
     } finally {
       setActionId(null);
     }
@@ -158,14 +123,14 @@ export default function AdminUsersPage() {
     if (roleTargetId == null || roleSelection === roleTargetCurrent) return;
     setActionId(roleTargetId);
     try {
-      await fetchWithAuth(`/api/admin/users/${roleTargetId}/role`, {
+      await clientApiRequest(`/api/admin/users/${roleTargetId}/role`, {
         method: 'PUT',
         body: JSON.stringify({ role: roleSelection }),
       });
       setRoleTargetId(null);
       await loadUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Role change failed');
+      setError(getErrorMessage(err, 'Role change failed'));
     } finally {
       setActionId(null);
     }
@@ -175,10 +140,10 @@ export default function AdminUsersPage() {
     if (!window.confirm('Unban this user?')) return;
     setActionId(userId);
     try {
-      await fetchWithAuth(`/api/admin/users/${userId}/unban`, { method: 'PUT' });
+      await clientApiRequest(`/api/admin/users/${userId}/unban`, { method: 'PUT' });
       await loadUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unban failed');
+      setError(getErrorMessage(err, 'Unban failed'));
     } finally {
       setActionId(null);
     }

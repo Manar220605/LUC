@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import FeedList from '@/components/question/FeedList';
+import QuestionSearchBox from '@/components/question/QuestionSearchBox';
 import type { QuestionSummaryDTO } from '@/lib/types';
 import {
   FEED_SORTS,
@@ -16,7 +17,9 @@ type Props = {
   sort: FeedSort;
   communityPath?: string;
   includeDescendants?: boolean;
+  search?: string;
   emptyMessage?: string;
+  showSearch?: boolean;
 };
 
 function tabClassName(active: boolean): string {
@@ -30,7 +33,9 @@ export default function FeedPanel({
   sort,
   communityPath,
   includeDescendants = true,
+  search,
   emptyMessage,
+  showSearch = true,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -40,6 +45,7 @@ export default function FeedPanel({
     sort,
     communityPath,
     includeDescendants: communityPath ? includeDescendants : undefined,
+    search,
   });
 
   function navigate(next: { sort?: FeedSort; includeDescendants?: boolean }) {
@@ -56,6 +62,16 @@ export default function FeedPanel({
 
   return (
     <div className="space-y-4">
+      {showSearch && (
+        <QuestionSearchBox
+          initialQuery={search ?? ''}
+          action={communityPath ? 'community' : 'global'}
+          placeholder={
+            communityPath ? 'Search in this community…' : 'Refine search…'
+          }
+        />
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           {FEED_SORTS.map((option) => (

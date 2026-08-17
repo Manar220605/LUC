@@ -13,6 +13,7 @@ import com.luc.qa.module.question.dto.QuestionSummaryDTO;
 import com.luc.qa.module.question.entity.Question;
 import com.luc.qa.module.question.entity.QuestionStatus;
 import com.luc.qa.module.question.repository.QuestionRepository;
+import com.luc.qa.module.notification.service.NotificationService;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.repository.UserRepository;
 import com.luc.qa.module.vote.dto.CastVoteRequestDTO;
@@ -43,6 +44,7 @@ public class VoteServiceImpl implements VoteService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Retryable(
@@ -62,7 +64,7 @@ public class VoteServiceImpl implements VoteService {
                 )
                 .orElseThrow(() -> new QuestionNotFoundException(request.getTargetId()));
             assertNotOwnContent(voter, question.getAuthor().getId());
-            return applyVote(
+            VoteApplyResult result = applyVote(
                 voter,
                 VoteTargetType.QUESTION,
                 question.getId(),
@@ -72,6 +74,16 @@ public class VoteServiceImpl implements VoteService {
                     .getScore(),
                 score -> updateQuestionScore(question.getId(), score)
             );
+            if (result.freshUpvote()) {
+                notificationService.notifyUpvote(
+                    voter,
+                    question.getAuthor(),
+                    question,
+                    VoteTargetType.QUESTION,
+                    question.getId()
+                );
+            }
+            return result.response();
         }
 
         Answer answer = answerRepository.findById(request.getTargetId())
@@ -80,7 +92,7 @@ public class VoteServiceImpl implements VoteService {
             throw new AnswerNotFoundException(request.getTargetId());
         }
         assertNotOwnContent(voter, answer.getAuthor().getId());
-        return applyVote(
+        VoteApplyResult result = applyVote(
             voter,
             VoteTargetType.ANSWER,
             answer.getId(),
@@ -91,6 +103,16 @@ public class VoteServiceImpl implements VoteService {
                 .getScore(),
             score -> updateAnswerScore(answer.getId(), score)
         );
+        if (result.freshUpvote()) {
+            notificationService.notifyUpvote(
+                voter,
+                answer.getAuthor(),
+                answer.getQuestion(),
+                VoteTargetType.ANSWER,
+                answer.getId()
+            );
+        }
+        return result.response();
     }
 
     @Override
@@ -165,7 +187,7 @@ public class VoteServiceImpl implements VoteService {
         return loadViewerVotes(voterId, targetType, targetIds);
     }
 
-    private VoteResponseDTO applyVote(
+    private VoteApplyResult applyVote(
         User voter,
         VoteTargetType targetType,
         Long targetId,
@@ -182,6 +204,7 @@ public class VoteServiceImpl implements VoteService {
         Integer viewerVote;
         int scoreDelta;
         int voteAsInt = value;
+        boolean freshUpvote = existingVote.isEmpty() && value == 1;
 
         if (existingVote.isEmpty()) {
             voteRepository.save(Vote.builder()
@@ -208,13 +231,16 @@ public class VoteServiceImpl implements VoteService {
         int newScore = currentScore + scoreDelta;
         scoreUpdater.update(newScore);
 
-        return VoteResponseDTO.builder()
+        VoteResponseDTO response = VoteResponseDTO.builder()
             .targetType(targetType)
             .targetId(targetId)
             .viewerVote(viewerVote)
             .score(newScore)
             .build();
+        return new VoteApplyResult(response, freshUpvote);
     }
+
+    private record VoteApplyResult(VoteResponseDTO response, boolean freshUpvote) {}
 
     private void updateQuestionScore(Long questionId, int newScore) {
         Question question = questionRepository.findByIdAndStatusNot(questionId, QuestionStatus.DELETED)

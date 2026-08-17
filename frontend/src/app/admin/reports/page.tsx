@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { clientApiRequest } from '@/lib/clientApi';
+import { getErrorMessage } from '@/lib/apiError';
 import {
   REPORT_REASON_LABELS,
   REPORT_TARGET_LABELS,
@@ -14,8 +16,6 @@ import {
   type ResolutionAction,
 } from '@/lib/report';
 import type { PageResponseDTO } from '@/lib/types';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 const STATUS_OPTIONS: { value: '' | ReportStatus; label: string }[] = [
   { value: '', label: 'All statuses' },
@@ -29,29 +29,6 @@ const TARGET_OPTIONS: { value: '' | ReportTargetType; label: string }[] = [
   { value: 'ANSWER', label: 'Answers' },
   { value: 'USER', label: 'Users' },
 ];
-
-async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const session = await getSession();
-  if (session?.error === 'RefreshAccessTokenError') {
-    throw new Error('Session expired; please sign in again');
-  }
-  const token = session?.accessToken;
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...init.headers,
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
-  }
-  if (res.status === 204) {
-    return undefined as T;
-  }
-  return res.json();
-}
 
 export default function AdminReportsPage() {
   const { status } = useSession();
@@ -79,13 +56,13 @@ export default function AdminReportsPage() {
       if (targetFilter) {
         params.set('targetType', targetFilter);
       }
-      const response = await apiRequest<PageResponseDTO<AdminReportResponseDTO>>(
+      const response = await clientApiRequest<PageResponseDTO<AdminReportResponseDTO>>(
         `/api/admin/reports?${params.toString()}`
       );
       setItems(response.content);
       setTotalPages(response.totalPages);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load report queue');
+      setError(getErrorMessage(err, 'Failed to load report queue'));
     } finally {
       setLoading(false);
     }
@@ -109,7 +86,7 @@ export default function AdminReportsPage() {
     setActionId(resolveId);
     setError(null);
     try {
-      await apiRequest(`/api/admin/reports/${resolveId}/resolve`, {
+      await clientApiRequest(`/api/admin/reports/${resolveId}/resolve`, {
         method: 'POST',
         body: JSON.stringify({
           action: resolutionAction,
@@ -121,7 +98,7 @@ export default function AdminReportsPage() {
       setResolutionAction('NONE');
       await loadQueue();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Resolve failed');
+      setError(getErrorMessage(err, 'Resolve failed'));
     } finally {
       setActionId(null);
     }

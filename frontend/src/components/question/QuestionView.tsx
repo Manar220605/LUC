@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSession, useSession } from 'next-auth/react';
 import AnswerThread from '@/components/question/AnswerThread';
+import MarkdownContent from '@/components/markdown/MarkdownContent';
 import ReportButton from '@/components/moderation/ReportButton';
 import VoteControls from '@/components/vote/VoteControls';
 import AuthorBadge from '@/components/user/AuthorBadge';
@@ -20,11 +21,15 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
   const { status } = useSession();
   const [question, setQuestion] = useState(initialQuestion);
   const [answerCount, setAnswerCount] = useState(initialQuestion.answerCount);
+  const [acceptedAnswerId, setAcceptedAnswerId] = useState<number | null>(
+    initialQuestion.acceptedAnswerId ?? null
+  );
   const enrichedWithAuthRef = useRef(false);
 
   useEffect(() => {
     setQuestion(initialQuestion);
     setAnswerCount(initialQuestion.answerCount);
+    setAcceptedAnswerId(initialQuestion.acceptedAnswerId ?? null);
     enrichedWithAuthRef.current = false;
   }, [initialQuestion, questionId]);
 
@@ -58,6 +63,7 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
         ownedByCurrentUser: updated.ownedByCurrentUser === true,
       }));
       setAnswerCount(updated.answerCount);
+      setAcceptedAnswerId(updated.acceptedAnswerId ?? null);
     }
 
     enrichQuestionWithAuth().catch(() => {
@@ -78,6 +84,7 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
     }
     const updated: QuestionResponseDTO = await res.json();
     setAnswerCount(updated.answerCount);
+    setAcceptedAnswerId(updated.acceptedAnswerId ?? null);
   }, [questionId]);
 
   return (
@@ -118,8 +125,8 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
         </div>
       </div>
 
-      <article className="mt-6 whitespace-pre-wrap rounded-lg border border-gray-200 bg-white p-6 text-gray-800">
-        {question.body}
+      <article className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
+        <MarkdownContent content={question.body} />
       </article>
 
       <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
@@ -136,7 +143,9 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
       <AnswerThread
         questionId={questionId}
         answerCount={answerCount}
+        questionOwnedByCurrentUser={question.ownedByCurrentUser === true}
         onAnswersChanged={refreshAnswerCount}
+        onAcceptedAnswerChange={setAcceptedAnswerId}
       />
     </main>
   );

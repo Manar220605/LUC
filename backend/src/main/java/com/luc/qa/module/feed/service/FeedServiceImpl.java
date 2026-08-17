@@ -23,6 +23,7 @@ public class FeedServiceImpl implements FeedService {
         FeedSort sort,
         String communityPath,
         boolean includeDescendants,
+        String search,
         int page,
         int size,
         String keycloakId
@@ -31,6 +32,9 @@ public class FeedServiceImpl implements FeedService {
         filter.setSort(sort != null ? sort : FeedSort.NEW);
         filter.setCommunityPath(communityPath);
         filter.setIncludeDescendants(includeDescendants);
+        if (search != null && !search.isBlank()) {
+            filter.setSearch(search.trim());
+        }
 
         Page<QuestionSummaryDTO> result = questionService.findFeed(
             filter,

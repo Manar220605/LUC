@@ -1,41 +1,16 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { clientApiRequest } from '@/lib/clientApi';
+import { getErrorMessage } from '@/lib/apiError';
+import { apiPublicGet } from '@/lib/apiPublic';
 import type {
   CommunityTreeNodeDTO,
   CreateCommunityRequestDTO,
   UpdateCommunityRequestDTO,
 } from '@/lib/types';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
-
-async function apiRequest<T>(
-  path: string,
-  init: RequestInit = {}
-): Promise<T> {
-  const session = await getSession();
-  if (session?.error === 'RefreshAccessTokenError') {
-    throw new Error('Session expired; please sign in again');
-  }
-  const token = session?.accessToken;
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...init.headers,
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
-  }
-  if (res.status === 204) {
-    return undefined as T;
-  }
-  return res.json();
-}
 
 function flattenTree(nodes: CommunityTreeNodeDTO[]): CommunityTreeNodeDTO[] {
   const result: CommunityTreeNodeDTO[] = [];
@@ -66,13 +41,9 @@ export default function AdminCommunitiesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/communities`, { cache: 'no-store' });
-      if (!res.ok) {
-        throw new Error(`API ${res.status}: ${await res.text()}`);
-      }
-      setTree(await res.json());
+      setTree(await apiPublicGet<CommunityTreeNodeDTO[]>('/api/communities'));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load communities');
+      setError(getErrorMessage(err, 'Failed to load communities'));
     } finally {
       setLoading(false);
     }
@@ -98,7 +69,7 @@ export default function AdminCommunitiesPage() {
         description: createDescription.trim() || undefined,
         parentPath: createParentPath.trim() || undefined,
       };
-      await apiRequest('/api/admin/communities', {
+      await clientApiRequest('/api/admin/communities', {
         method: 'POST',
         body: JSON.stringify(body),
       });
@@ -107,7 +78,7 @@ export default function AdminCommunitiesPage() {
       setCreateDescription('');
       await loadTree();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Create failed');
+      setError(getErrorMessage(err, 'Create failed'));
     }
   }
 
@@ -122,27 +93,27 @@ export default function AdminCommunitiesPage() {
         name: editName.trim(),
         description: editDescription.trim() || undefined,
       };
-      await apiRequest(`/api/admin/communities/${editId}`, {
+      await clientApiRequest(`/api/admin/communities/${editId}`, {
         method: 'PUT',
         body: JSON.stringify(body),
       });
       setEditId(null);
       await loadTree();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Update failed');
+      setError(getErrorMessage(err, 'Update failed'));
     }
   }
 
   async function handleDelete(id: number) {
     setError(null);
     try {
-      await apiRequest(`/api/admin/communities/${id}`, { method: 'DELETE' });
+      await clientApiRequest(`/api/admin/communities/${id}`, { method: 'DELETE' });
       if (editId === id) {
         setEditId(null);
       }
       await loadTree();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Delete failed');
+      setError(getErrorMessage(err, 'Delete failed'));
     }
   }
 

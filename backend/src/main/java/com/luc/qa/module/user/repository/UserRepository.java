@@ -11,6 +11,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     Optional<User> findByKeycloakId(UUID keycloakId);
 
+    Optional<User> findByDisplayNameIgnoreCase(String displayName);
+
+    boolean existsByEmailIgnoreCase(String email);
+
     boolean existsByStudentId(String studentId);
 
     boolean existsByStudentIdAndIdNot(String studentId, Long id);

@@ -1,5 +1,6 @@
 import QuestionView from '@/components/question/QuestionView';
 import { auth } from '@/lib/auth';
+import { ApiError } from '@/lib/apiError';
 import type { QuestionResponseDTO } from '@/lib/types';
 
 const API_URL =
@@ -23,7 +24,7 @@ async function fetchQuestion(id: string): Promise<QuestionResponseDTO> {
     cache: 'no-store',
   });
   if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
+    throw await ApiError.fromResponse(res);
   }
   return res.json();
 }

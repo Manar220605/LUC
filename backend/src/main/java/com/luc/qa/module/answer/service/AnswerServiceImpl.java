@@ -11,11 +11,13 @@ import com.luc.qa.module.answer.dto.UpdateAnswerRequestDTO;
 import com.luc.qa.module.answer.entity.Answer;
 import com.luc.qa.module.answer.mapper.AnswerMapper;
 import com.luc.qa.module.answer.repository.AnswerRepository;
+import com.luc.qa.module.notification.service.NotificationService;
 import com.luc.qa.module.question.entity.Question;
 import com.luc.qa.module.question.repository.QuestionRepository;
 import com.luc.qa.module.question.service.QuestionService;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.repository.UserRepository;
+import com.luc.qa.module.vote.entity.VoteTargetType;
 import com.luc.qa.module.vote.service.VoteService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,11 +39,15 @@ public class AnswerServiceImpl implements AnswerService {
     private final UserRepository userRepository;
     private final AnswerMapper answerMapper;
     private final VoteService voteService;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
     public List<AnswerTreeNodeDTO> getAnswerTree(Long questionId, String keycloakId) {
-        questionService.findById(questionId);
+        Question question = questionService.findById(questionId);
+        Long acceptedAnswerId = question.getAcceptedAnswer() != null
+            ? question.getAcceptedAnswer().getId()
+            : null;
 
         List<Answer> flat = answerRepository.findByQuestionIdOrderByCreatedAtAsc(questionId);
         Map<Long, List<Answer>> childrenByParentId = new HashMap<>();
@@ -58,8 +64,20 @@ public class AnswerServiceImpl implements AnswerService {
             }
         }
 
+        if (acceptedAnswerId != null) {
+            roots.sort((left, right) -> {
+                if (left.getId().equals(acceptedAnswerId)) {
+                    return -1;
+                }
+                if (right.getId().equals(acceptedAnswerId)) {
+                    return 1;
+                }
+                return 0;
+            });
+        }
+
         List<AnswerTreeNodeDTO> tree = roots.stream()
-            .map(root -> buildTreeNode(root, childrenByParentId, currentUserId))
+            .map(root -> buildTreeNode(root, childrenByParentId, currentUserId, acceptedAnswerId))
             .toList();
         voteService.enrichAnswerTree(tree, keycloakId);
         return tree;
@@ -83,6 +101,15 @@ public class AnswerServiceImpl implements AnswerService {
 
         Answer saved = answerRepository.save(answer);
         questionRepository.incrementAnswerCount(question.getId());
+        notificationService.notifyAnswerOnQuestion(author, question, saved);
+        notificationService.notifyMentions(
+            author,
+            request.getBody(),
+            question,
+            VoteTargetType.ANSWER,
+            saved.getId(),
+            request.isAnonymous()
+        );
         return toOwnedResponse(reload(saved.getId()));
     }
 
@@ -112,6 +139,14 @@ public class AnswerServiceImpl implements AnswerService {
 
         Answer saved = answerRepository.save(answer);
         questionRepository.incrementAnswerCount(question.getId());
+        notificationService.notifyMentions(
+            author,
+            request.getBody(),
+            question,
+            VoteTargetType.ANSWER,
+            saved.getId(),
+            request.isAnonymous()
+        );
         return toOwnedResponse(reload(saved.getId()));
     }
 
@@ -126,6 +161,14 @@ public class AnswerServiceImpl implements AnswerService {
         answer.setBody(request.getBody().trim());
         answer.setAnonymous(request.isAnonymous());
         Answer saved = answerRepository.save(answer);
+        notificationService.notifyMentions(
+            answer.getAuthor(),
+            request.getBody(),
+            answer.getQuestion(),
+            VoteTargetType.ANSWER,
+            saved.getId(),
+            request.isAnonymous()
+        );
         return toOwnedResponse(reload(saved.getId()));
     }
 
@@ -140,18 +183,27 @@ public class AnswerServiceImpl implements AnswerService {
         answer.setDeleted(true);
         answerRepository.save(answer);
         questionRepository.decrementAnswerCount(answer.getQuestion().getId());
+
+        Question question = answer.getQuestion();
+        if (question.getAcceptedAnswer() != null
+            && question.getAcceptedAnswer().getId().equals(answer.getId())) {
+            question.setAcceptedAnswer(null);
+            questionRepository.save(question);
+        }
     }
 
     private AnswerTreeNodeDTO buildTreeNode(
         Answer answer,
         Map<Long, List<Answer>> childrenByParentId,
-        Long currentUserId
+        Long currentUserId,
+        Long acceptedAnswerId
     ) {
         AnswerTreeNodeDTO node = answerMapper.toTreeNode(answer);
         node.setOwnedByCurrentUser(isOwnedBy(answer, currentUserId));
+        node.setAccepted(acceptedAnswerId != null && acceptedAnswerId.equals(answer.getId()));
         List<Answer> children = childrenByParentId.getOrDefault(answer.getId(), List.of());
         node.setReplies(children.stream()
-            .map(child -> buildTreeNode(child, childrenByParentId, currentUserId))
+            .map(child -> buildTreeNode(child, childrenByParentId, currentUserId, acceptedAnswerId))
             .toList());
         return node;
     }

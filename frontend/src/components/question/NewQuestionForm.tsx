@@ -3,13 +3,14 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { getSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { ApiError, getErrorMessage } from '@/lib/apiError';
+import { clientApiRequest } from '@/lib/clientApi';
 import CommunityPicker from '@/components/community/CommunityPicker';
+import { apiPublicGet } from '@/lib/apiPublic';
 import type {
   CommunityTreeNodeDTO,
   CreateQuestionRequestDTO,
 } from '@/lib/types';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 export default function NewQuestionForm() {
   const router = useRouter();
@@ -22,14 +23,8 @@ export default function NewQuestionForm() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/communities`, { cache: 'no-store' })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`API ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data: CommunityTreeNodeDTO[]) => {
+    apiPublicGet<CommunityTreeNodeDTO[]>('/api/communities')
+      .then((data) => {
         setTree(data);
         if (data.length > 0) {
           setCommunityPath(data[0].path);
@@ -46,11 +41,10 @@ export default function NewQuestionForm() {
     try {
       const session = await getSession();
       if (session?.error === 'RefreshAccessTokenError') {
-        throw new Error('Session expired; please sign in again');
+        throw new ApiError(401, 'Session expired; please sign in again');
       }
-      const token = session?.accessToken;
-      if (!token) {
-        throw new Error('You must be signed in to post a question');
+      if (!session?.accessToken) {
+        throw new ApiError(401, 'You must be signed in to post a question');
       }
 
       const payload: CreateQuestionRequestDTO = {
@@ -60,23 +54,14 @@ export default function NewQuestionForm() {
         anonymous,
       };
 
-      const res = await fetch(`${API_URL}/api/questions`, {
+      const created = await clientApiRequest<{ id: number }>('/api/questions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        throw new Error(`API ${res.status}: ${await res.text()}`);
-      }
-
-      const created = await res.json();
       router.push(`/questions/${created.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create question');
+      setError(getErrorMessage(err, 'Failed to create question'));
     } finally {
       setSubmitting(false);
     }

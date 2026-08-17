@@ -23,6 +23,7 @@ public abstract class QuestionMapper {
 
     @Mapping(target = "author", expression = "java(mapPublicAuthor(question))")
     @Mapping(target = "community", source = "community")
+    @Mapping(target = "acceptedAnswerId", source = "acceptedAnswer.id")
     public abstract QuestionResponseDTO toResponse(Question question);
 
     protected PublicAuthorDTO mapPublicAuthor(Question question) {

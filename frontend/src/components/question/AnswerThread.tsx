@@ -2,13 +2,17 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { getSession, signIn, useSession } from 'next-auth/react';
+import { clientApiRequest } from '@/lib/clientApi';
+import { ApiError, getErrorMessage } from '@/lib/apiError';
 import VoteControls from '@/components/vote/VoteControls';
+import MarkdownContent from '@/components/markdown/MarkdownContent';
 import ReportButton from '@/components/moderation/ReportButton';
 import AuthorBadge from '@/components/user/AuthorBadge';
 import type {
   AnswerResponseDTO,
   AnswerTreeNodeDTO,
   CreateAnswerRequestDTO,
+  QuestionResponseDTO,
   UpdateAnswerRequestDTO,
 } from '@/lib/types';
 
@@ -17,7 +21,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 type Props = {
   questionId: string;
   answerCount: number;
+  questionOwnedByCurrentUser?: boolean;
   onAnswersChanged?: () => Promise<void>;
+  onAcceptedAnswerChange?: (acceptedAnswerId: number | null) => void;
 };
 
 type OnAnswersChanged = (
@@ -28,29 +34,13 @@ type OnAnswersChanged = (
 async function authFetch<T>(path: string, init: RequestInit = {}): Promise<T | undefined> {
   const session = await getSession();
   if (session?.error === 'RefreshAccessTokenError') {
-    throw new Error('Session expired; please sign in again');
+    throw new ApiError(401, 'Session expired; please sign in again');
   }
-  const token = session?.accessToken;
-  if (!token) {
-    throw new Error('You must be signed in');
+  if (!session?.accessToken) {
+    throw new ApiError(401, 'You must be signed in');
   }
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      ...init.headers,
-    },
-  });
-
-  if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
-  }
-  if (res.status === 204) {
-    return undefined;
-  }
-  return res.json() as Promise<T>;
+  return clientApiRequest<T>(path, init);
 }
 
 function normalizeAnswerTree(nodes: AnswerTreeNodeDTO[]): AnswerTreeNodeDTO[] {
@@ -169,7 +159,7 @@ async function fetchAnswers(
     cache: 'no-store',
   });
   if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
+    throw await ApiError.fromResponse(res);
   }
   return res.json();
 }
@@ -266,7 +256,7 @@ function AnswerComposer({
       setBody('');
       setAnonymous(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Request failed');
+      setError(getErrorMessage(err, 'Request failed'));
     } finally {
       setSubmitting(false);
     }
@@ -317,17 +307,23 @@ function AnswerComposer({
 function AnswerNode({
   answer,
   depth,
+  questionId,
+  questionOwnedByCurrentUser,
   ownedAnswerIds,
   onChanged,
   onSignInRequired,
   onVoteChange,
+  onAcceptedAnswerChange,
 }: {
   answer: AnswerTreeNodeDTO;
   depth: number;
+  questionId: string;
+  questionOwnedByCurrentUser: boolean;
   ownedAnswerIds: ReadonlySet<number>;
   onChanged: OnAnswersChanged;
   onSignInRequired: () => void;
   onVoteChange: (answerId: number, score: number, viewerVote: number | null) => void;
+  onAcceptedAnswerChange?: (acceptedAnswerId: number | null) => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
@@ -364,9 +360,40 @@ function AnswerNode({
     setError(null);
     try {
       await authFetch<void>(`/api/answers/${answer.id}`, { method: 'DELETE' });
+      if (answer.accepted) {
+        onAcceptedAnswerChange?.(null);
+      }
       await onChanged(undefined, answer.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Delete failed');
+      setError(getErrorMessage(err, 'Delete failed'));
+    }
+  }
+
+  async function handleAccept() {
+    setError(null);
+    try {
+      await authFetch<QuestionResponseDTO>(
+        `/api/questions/${questionId}/accepted-answer/${answer.id}`,
+        { method: 'PUT' }
+      );
+      onAcceptedAnswerChange?.(answer.id);
+      await onChanged();
+    } catch (err) {
+      setError(getErrorMessage(err, 'Could not accept answer'));
+    }
+  }
+
+  async function handleUnaccept() {
+    setError(null);
+    try {
+      await authFetch<QuestionResponseDTO>(
+        `/api/questions/${questionId}/accepted-answer`,
+        { method: 'DELETE' }
+      );
+      onAcceptedAnswerChange?.(null);
+      await onChanged();
+    } catch (err) {
+      setError(getErrorMessage(err, 'Could not remove accepted answer'));
     }
   }
 
@@ -384,7 +411,13 @@ function AnswerNode({
       className="border-l border-gray-200 pl-4"
       style={{ marginLeft: depth > 0 ? '0.75rem' : undefined }}
     >
-      <article className="rounded-lg border border-gray-200 bg-white p-4">
+      <article
+        className={`rounded-lg border bg-white p-4 ${
+          answer.accepted
+            ? 'border-green-500 bg-green-50 ring-1 ring-green-200'
+            : 'border-gray-200'
+        }`}
+      >
         <div className="flex items-start gap-3">
           {!answer.deleted && (
             <VoteControls
@@ -397,6 +430,12 @@ function AnswerNode({
             />
           )}
           <div className="min-w-0 flex-1">
+            {answer.accepted && !answer.deleted && (
+              <p className="mb-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800">
+                <span aria-hidden="true">✓</span>
+                Accepted answer
+              </p>
+            )}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
               <span className="flex flex-wrap items-center gap-2 font-medium text-gray-700">
                 <span>{answer.author.displayName}</span>
@@ -416,7 +455,9 @@ function AnswerNode({
                 onCancel={() => setEditOpen(false)}
               />
             ) : (
-              <p className="mt-2 whitespace-pre-wrap text-gray-800">{answer.body}</p>
+              <div className="mt-2">
+                <MarkdownContent content={answer.body} />
+              </div>
             )}
 
             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
@@ -461,6 +502,25 @@ function AnswerNode({
               </button>
             </>
           )}
+          {questionOwnedByCurrentUser && depth === 0 && !answer.deleted && (
+            answer.accepted ? (
+              <button
+                type="button"
+                onClick={handleUnaccept}
+                className="font-medium text-green-700 hover:text-green-900"
+              >
+                Unaccept
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAccept}
+                className="font-medium text-green-700 hover:text-green-900"
+              >
+                Accept answer
+              </button>
+            )
+          )}
           {hasReplies && (
             <button
               type="button"
@@ -492,10 +552,13 @@ function AnswerNode({
               key={reply.id}
               answer={reply}
               depth={depth + 1}
+              questionId={questionId}
+              questionOwnedByCurrentUser={questionOwnedByCurrentUser}
               ownedAnswerIds={ownedAnswerIds}
               onChanged={onChanged}
               onSignInRequired={onSignInRequired}
               onVoteChange={onVoteChange}
+              onAcceptedAnswerChange={onAcceptedAnswerChange}
             />
           ))}
         </div>
@@ -507,7 +570,9 @@ function AnswerNode({
 export default function AnswerThread({
   questionId,
   answerCount,
+  questionOwnedByCurrentUser = false,
   onAnswersChanged,
+  onAcceptedAnswerChange,
 }: Props) {
   const { status } = useSession();
   const [answers, setAnswers] = useState<AnswerTreeNodeDTO[]>([]);
@@ -745,7 +810,7 @@ export default function AnswerThread({
             try {
               await handleTopLevelSubmit(body, anonymous);
             } catch (err) {
-              setError(err instanceof Error ? err.message : 'Request failed');
+              setError(getErrorMessage(err, 'Request failed'));
               throw err;
             }
           }}
@@ -762,10 +827,13 @@ export default function AnswerThread({
               key={answer.id}
               answer={answer}
               depth={0}
+              questionId={questionId}
+              questionOwnedByCurrentUser={questionOwnedByCurrentUser}
               ownedAnswerIds={ownedAnswerIds}
               onChanged={refreshAfterMutation}
               onSignInRequired={requireSignIn}
               onVoteChange={handleVoteChange}
+              onAcceptedAnswerChange={onAcceptedAnswerChange}
             />
           ))
         )}

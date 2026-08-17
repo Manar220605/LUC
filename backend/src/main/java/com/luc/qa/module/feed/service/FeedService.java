@@ -11,6 +11,7 @@ public interface FeedService {
         FeedSort sort,
         String communityPath,
         boolean includeDescendants,
+        String search,
         int page,
         int size,
         String keycloakId

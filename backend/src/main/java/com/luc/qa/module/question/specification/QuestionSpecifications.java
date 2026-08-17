@@ -30,14 +30,4 @@ public final class QuestionSpecifications {
             );
         };
     }
-
-    public static Specification<Question> titleOrBodyContains(String search) {
-        return (root, query, cb) -> {
-            String like = "%" + search.toLowerCase() + "%";
-            return cb.or(
-                cb.like(cb.lower(root.get("title")), like),
-                cb.like(cb.lower(root.get("body")), like)
-            );
-        };
-    }
 }

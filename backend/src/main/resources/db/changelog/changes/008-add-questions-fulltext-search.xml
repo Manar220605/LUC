@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="008-questions-fulltext-search" author="luc">
+        <sql>ALTER TABLE questions ADD COLUMN search_vector tsvector;</sql>
+
+        <sql>
+            UPDATE questions
+            SET search_vector = to_tsvector('english', coalesce(title, '') || ' ' || coalesce(body, ''));
+        </sql>
+
+        <sql>
+            CREATE INDEX idx_questions_search_vector ON questions USING GIN (search_vector);
+        </sql>
+
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION questions_search_vector_trigger() RETURNS trigger AS $$
+            BEGIN
+              NEW.search_vector := to_tsvector('english', coalesce(NEW.title, '') || ' ' || coalesce(NEW.body, ''));
+              RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+
+        <sql>
+            CREATE TRIGGER trg_questions_search_vector
+            BEFORE INSERT OR UPDATE OF title, body ON questions
+            FOR EACH ROW EXECUTE FUNCTION questions_search_vector_trigger();
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

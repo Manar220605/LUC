@@ -81,6 +81,33 @@ public class QuestionController {
         questionService.softDelete(id, jwt.getSubject());
     }
 
+    @PutMapping("/{questionId}/accepted-answer/{answerId}")
+    @PreAuthorize("isAuthenticated()")
+    public QuestionResponseDTO acceptAnswer(
+        @PathVariable Long questionId,
+        @PathVariable Long answerId,
+        @AuthenticationPrincipal Jwt jwt
+    ) {
+        Question question = questionService.acceptAnswer(questionId, answerId, jwt.getSubject());
+        Question reloaded = questionService.findById(question.getId());
+        QuestionResponseDTO response = questionMapper.toResponse(reloaded);
+        voteService.enrichQuestionResponse(response, reloaded, jwt.getSubject());
+        return response;
+    }
+
+    @DeleteMapping("/{questionId}/accepted-answer")
+    @PreAuthorize("isAuthenticated()")
+    public QuestionResponseDTO unacceptAnswer(
+        @PathVariable Long questionId,
+        @AuthenticationPrincipal Jwt jwt
+    ) {
+        Question question = questionService.unacceptAnswer(questionId, jwt.getSubject());
+        Question reloaded = questionService.findById(question.getId());
+        QuestionResponseDTO response = questionMapper.toResponse(reloaded);
+        voteService.enrichQuestionResponse(response, reloaded, jwt.getSubject());
+        return response;
+    }
+
     private String resolveKeycloakId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof JwtAuthenticationToken jwtAuth) {

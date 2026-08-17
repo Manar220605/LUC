@@ -1,8 +1,10 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { clientApiRequest } from '@/lib/clientApi';
+import { getErrorMessage } from '@/lib/apiError';
 import { degreeLabel, facultyLabel } from '@/lib/alumni';
 import type {
   AdminVerificationResponseDTO,
@@ -10,37 +12,12 @@ import type {
   VerificationStatus,
 } from '@/lib/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
-
 const STATUS_OPTIONS: { value: '' | VerificationStatus; label: string }[] = [
   { value: '', label: 'All statuses' },
   { value: 'PENDING', label: 'Pending' },
   { value: 'APPROVED', label: 'Approved' },
   { value: 'REJECTED', label: 'Rejected' },
 ];
-
-async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const session = await getSession();
-  if (session?.error === 'RefreshAccessTokenError') {
-    throw new Error('Session expired; please sign in again');
-  }
-  const token = session?.accessToken;
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...init.headers,
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
-  }
-  if (res.status === 204) {
-    return undefined as T;
-  }
-  return res.json();
-}
 
 export default function AdminVerificationsPage() {
   const { status } = useSession();
@@ -61,12 +38,12 @@ export default function AdminVerificationsPage() {
       if (statusFilter) {
         params.set('status', statusFilter);
       }
-      const page = await apiRequest<PageResponseDTO<AdminVerificationResponseDTO>>(
+      const page = await clientApiRequest<PageResponseDTO<AdminVerificationResponseDTO>>(
         `/api/admin/verifications?${params.toString()}`
       );
       setItems(page.content);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load verification queue');
+      setError(getErrorMessage(err, 'Failed to load verification queue'));
     } finally {
       setLoading(false);
     }
@@ -86,11 +63,11 @@ export default function AdminVerificationsPage() {
     setActionId(id);
     setError(null);
     try {
-      await apiRequest(`/api/admin/verifications/${id}/approve`, { method: 'POST' });
+      await clientApiRequest(`/api/admin/verifications/${id}/approve`, { method: 'POST' });
       setRejectId(null);
       await loadQueue();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Approve failed');
+      setError(getErrorMessage(err, 'Approve failed'));
     } finally {
       setActionId(null);
     }
@@ -104,7 +81,7 @@ export default function AdminVerificationsPage() {
     setActionId(rejectId);
     setError(null);
     try {
-      await apiRequest(`/api/admin/verifications/${rejectId}/reject`, {
+      await clientApiRequest(`/api/admin/verifications/${rejectId}/reject`, {
         method: 'POST',
         body: JSON.stringify({ rejectionReason: rejectionReason.trim() }),
       });
@@ -112,7 +89,7 @@ export default function AdminVerificationsPage() {
       setRejectionReason('');
       await loadQueue();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Reject failed');
+      setError(getErrorMessage(err, 'Reject failed'));
     } finally {
       setActionId(null);
     }

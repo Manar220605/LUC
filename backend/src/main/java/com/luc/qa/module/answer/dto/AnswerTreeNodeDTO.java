@@ -28,6 +28,8 @@ public class AnswerTreeNodeDTO {
 
     private Integer viewerVote;
 
+    private boolean accepted;
+
     @Builder.Default
     private List<AnswerTreeNodeDTO> replies = new ArrayList<>();
 }

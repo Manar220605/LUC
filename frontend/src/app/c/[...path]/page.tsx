@@ -11,7 +11,7 @@ import { buildFeedQuery, parseFeedSort } from '@/lib/feed';
 
 type Props = {
   params: Promise<{ path: string[] }>;
-  searchParams: Promise<{ sort?: string; includeDescendants?: string }>;
+  searchParams: Promise<{ sort?: string; includeDescendants?: string; search?: string }>;
 };
 
 export default async function CommunityPage({ params, searchParams }: Props) {
@@ -20,7 +20,8 @@ export default async function CommunityPage({ params, searchParams }: Props) {
   const path = segments.join('/');
   const sort = parseFeedSort(query.sort);
   const includeDescendants = query.includeDescendants !== 'false';
-  const feedQuery = buildFeedQuery({ sort, communityPath: path, includeDescendants });
+  const search = query.search?.trim();
+  const feedQuery = buildFeedQuery({ sort, communityPath: path, includeDescendants, search });
 
   const [community, feed] = await Promise.all([
     apiPublicGet<CommunityResponseDTO>(`/api/communities/by-path?path=${encodeURIComponent(path)}`),
@@ -45,7 +46,12 @@ export default async function CommunityPage({ params, searchParams }: Props) {
               sort={sort}
               communityPath={path}
               includeDescendants={includeDescendants}
-              emptyMessage="No questions in this community yet."
+              search={search}
+              emptyMessage={
+                search
+                  ? `No questions match “${search}” in this community.`
+                  : 'No questions in this community yet.'
+              }
             />
           </Suspense>
         </div>
