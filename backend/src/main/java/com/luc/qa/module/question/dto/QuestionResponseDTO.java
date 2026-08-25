@@ -1,6 +1,7 @@
 package com.luc.qa.module.question.dto;
 
 import com.luc.qa.module.community.dto.CommunityResponseDTO;
+import com.luc.qa.module.course.dto.CourseSummaryDTO;
 import com.luc.qa.module.question.entity.QuestionStatus;
 import com.luc.qa.module.user.dto.PublicAuthorDTO;
 import java.time.Instant;
@@ -28,4 +29,5 @@ public class QuestionResponseDTO {
     private Integer viewerVote;
     private boolean ownedByCurrentUser;
     private Long acceptedAnswerId;
+    private CourseSummaryDTO course;
 }

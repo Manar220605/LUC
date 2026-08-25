@@ -22,4 +22,6 @@ public class QuestionSummaryDTO {
     private Instant createdAt;
     private Integer viewerVote;
     private boolean ownedByCurrentUser;
+    private String courseCode;
+    private String courseTitle;
 }

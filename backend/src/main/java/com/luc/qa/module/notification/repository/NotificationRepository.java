@@ -13,8 +13,14 @@ import org.springframework.data.repository.query.Param;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    @EntityGraph(attributePaths = {"actor", "question"})
+    @EntityGraph(attributePaths = {"actor", "question", "question.community"})
     Page<Notification> findByRecipientIdOrderByCreatedAtDesc(Long recipientId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"actor", "question", "question.community"})
+    Page<Notification> findByRecipientIdAndReadAtIsNullOrderByCreatedAtDesc(
+        Long recipientId,
+        Pageable pageable
+    );
 
     long countByRecipientIdAndReadAtIsNull(Long recipientId);
 

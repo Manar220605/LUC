@@ -74,8 +74,25 @@ public class KeycloakAdminClient {
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);
         credential.setValue(password);
-        credential.setTemporary(true);
+        credential.setTemporary(false);
         realm().users().get(keycloakUserId.toString()).resetPassword(credential);
+    }
+
+    /**
+     * Used for forgot-password from Keycloak itself, not for student sign-up.
+     */
+    public void sendPasswordSetupEmail(
+        UUID keycloakUserId,
+        String clientId,
+        String redirectUri,
+        int linkLifespanSeconds
+    ) {
+        realm().users().get(keycloakUserId.toString()).executeActionsEmail(
+            clientId,
+            redirectUri,
+            linkLifespanSeconds,
+            List.of("UPDATE_PASSWORD")
+        );
     }
 
     private void updateEnabled(UUID keycloakUserId, boolean enabled) {

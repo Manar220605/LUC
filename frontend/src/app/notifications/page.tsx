@@ -1,16 +1,25 @@
 'use client';
 
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { clientApiRequest } from '@/lib/clientApi';
 import { getErrorMessage } from '@/lib/apiError';
-import { formatNotificationTime, notificationHref } from '@/lib/notification';
+import { notifyNotificationsRead } from '@/lib/notification';
+import NotificationRow from '@/components/notifications/NotificationRow';
 import type {
   NotificationResponseDTO,
   PageResponseDTO,
 } from '@/lib/types';
+
+function markRead(
+  items: NotificationResponseDTO[],
+  id?: number
+): NotificationResponseDTO[] {
+  return items.map((item) =>
+    id == null || item.id === id ? { ...item, read: true } : item
+  );
+}
 
 export default function NotificationsPage() {
   const { status } = useSession();
@@ -48,30 +57,30 @@ export default function NotificationsPage() {
     }
   }, [status, router, loadPage]);
 
+  const hasUnread = items.some((item) => !item.read);
+
   async function handleMarkAllRead() {
     try {
       await clientApiRequest<void>('/api/notifications/read-all', { method: 'POST' });
-      setItems((current) => current.map((item) => ({ ...item, read: true })));
+      setItems((current) => markRead(current));
+      notifyNotificationsRead();
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to mark notifications as read'));
     }
   }
 
   async function handleItemClick(notification: NotificationResponseDTO) {
-    if (!notification.read) {
-      try {
-        await clientApiRequest<NotificationResponseDTO>(
-          `/api/notifications/${notification.id}/read`,
-          { method: 'POST' }
-        );
-        setItems((current) =>
-          current.map((item) =>
-            item.id === notification.id ? { ...item, read: true } : item
-          )
-        );
-      } catch {
-        // still navigate
-      }
+    if (notification.read) {
+      return;
+    }
+    try {
+      await clientApiRequest<NotificationResponseDTO>(
+        `/api/notifications/${notification.id}/read`,
+        { method: 'POST' }
+      );
+      setItems((current) => markRead(current, notification.id));
+    } catch {
+      // still navigate
     }
   }
 
@@ -89,16 +98,18 @@ export default function NotificationsPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
           <p className="mt-1 text-sm text-gray-600">
-            Answers, upvotes, and mentions.
+            Unread items stay highlighted. Opening one marks it read and keeps it here.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleMarkAllRead}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
-          Mark all read
-        </button>
+        {hasUnread && (
+          <button
+            type="button"
+            onClick={handleMarkAllRead}
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Mark all read
+          </button>
+        )}
       </div>
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
@@ -107,23 +118,15 @@ export default function NotificationsPage() {
         {loading ? (
           <p className="text-sm text-gray-500">Loading notifications…</p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-gray-500">You have no notifications yet.</p>
+          <p className="text-sm text-gray-500">No notifications yet.</p>
         ) : (
-          <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+          <ul className="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white">
             {items.map((notification) => (
               <li key={notification.id}>
-                <Link
-                  href={notificationHref(notification)}
+                <NotificationRow
+                  notification={notification}
                   onClick={() => handleItemClick(notification)}
-                  className={`block px-4 py-4 hover:bg-gray-50 ${
-                    notification.read ? '' : 'bg-blue-50/60'
-                  }`}
-                >
-                  <p className="font-medium text-gray-900">{notification.message}</p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {formatNotificationTime(notification.createdAt)}
-                  </p>
-                </Link>
+                />
               </li>
             ))}
           </ul>

@@ -46,6 +46,9 @@ Desktop.ini
 # Docker
 docker-compose.override.local.yml
 
+# Uploaded files
+backend/uploads/
+
 # Logs
 *.log
 logs/

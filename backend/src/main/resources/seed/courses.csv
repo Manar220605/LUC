@@ -1,0 +1,45 @@
+code,title,year_level,semester,credits,description,topics
+M1100,Algebra 1,1,1,6,First-year algebra covering sets linear systems and vector spaces.,linear-algebra
+M1101,Analysis 1,1,1,6,First-year calculus and analysis covering functions limits and derivatives.,calculus
+P1101,Electricity and Mechanics,1,1,6,Introductory electricity and mechanics for first-year science students.,computer-architecture
+P1100,Classical Mechanics,1,1,6,Classical mechanics covering kinematics Newton laws and energy.,computer-architecture
+I1100,Introduction to Informatics,1,1,3,What computing is: hardware software and how programmes run.,linux|git
+S1100,Statistics,1,1,3,Descriptive statistics and an introduction to probability.,statistics
+M1102,Algebra 2,1,2,3,Continuation of first-year algebra.,linear-algebra
+M1103,Algebra 3,1,2,6,Further algebra for the CS licence.,linear-algebra
+M1104,Analysis 2,1,2,6,Continuation of analysis covering integration and sequences.,calculus
+M1105,Analysis 3,1,2,6,Further analysis topics in year 1.,calculus
+M1106,Analysis 4,1,2,3,Short analysis module closing year 1.,calculus
+I1101,Algorithm and Programming,1,2,6,First algorithms and structured programming covering control flow functions and problem solving.,algorithms|data-structures
+I2201,Web Development,2,1,4,Building websites with HTML CSS and client-side basics.,web-development
+I2202,Computer Organization,2,1,4,How a computer is organized: CPU memory and instruction flow.,computer-architecture
+I2203,Operating System 1,2,1,4,Processes files and the basics of operating systems.,operating-systems|linux
+I2204,Imperative Programming,2,1,5,Imperative programming in a C-like style covering memory arrays and procedures.,algorithms|data-structures
+I2205,Graphs,2,1,3,Graph theory and basic graph algorithms.,graphs|algorithms|discrete-math
+S2250,Statistics,2,1,4,Probability and statistics for second-year CS.,statistics
+M2250,Arithmetics in Z,2,1,3,Integer arithmetic and number theory used in CS.,discrete-math
+M2251,Matlab,2,1,3,Numerical computing with Matlab for science students.,calculus|statistics
+I2206,Data Structures,2,2,5,Lists trees hash tables complexity and choosing a structure.,data-structures|algorithms
+I2207,Computer Architecture,2,2,4,CPU design memory hierarchy and digital building blocks.,computer-architecture
+I2208,Network 1,2,2,4,Computer networks covering layers IP and sockets.,networks
+I2209,Logical Programming,2,2,4,Logic programming (Prolog-style) and declarative problem solving.,logic-programming|discrete-math
+I2210,Database 1,2,2,5,Relational databases SQL keys and schema design.,databases|sql
+I2211,Object Oriented Programming (Java),2,2,5,Classes objects inheritance and Java.,java|oop
+I2234,Image Processing,2,2,3,Digital images filters and basic computer vision.,image-processing
+DHR300,Human Rights,3,1,3,Human rights module in the LU licence programme.,human-rights
+I3301,Software Engineering,3,1,4,Software process requirements design and testing.,software-engineering|git|project-management
+I3302,PHP,3,1,4,Server-side web programming with PHP and a database.,php|web-development|sql
+I3303,Operating System 2,3,1,4,Deeper OS topics covering scheduling memory and concurrency.,operating-systems|linux|parallel-programming
+I3304,Network 2,3,1,4,Routing transport and application protocols.,networks|security
+I3305,Graphic Interface,3,1,3,Building graphical user interfaces.,java|oop|web-development
+I3306,Database 2,3,1,3,Transactions indexing and more advanced SQL.,databases|sql
+I3350,Mobile Applications,3,1,5,Building mobile applications.,mobile-apps|java|oop
+I3307,Theory of Computation,3,2,4,Automata grammars and what a computer can compute.,theory-of-computation|discrete-math
+I3308,Project,3,2,4,End-of-licence software project.,software-engineering|project-management|git
+L3300,Foreign Language,3,2,3,Language module in the third year.,computer-and-society
+I3330,IT Project Management,3,2,3,Planning and running an IT project.,project-management|software-engineering
+I3331,Computer and Society,3,2,3,Ethics impact of computing and society.,computer-and-society
+I3332,Generation Programming,3,2,3,Code generation and related programming techniques.,algorithms|software-engineering
+I3333,Image Synthesis,3,2,3,Computer graphics and image synthesis.,image-processing
+I3340,Parallel Programming,3,2,4,Threads concurrency and parallel algorithms.,parallel-programming|operating-systems
+I3341,Advanced Algorithms,3,2,4,Harder algorithms and complexity.,algorithms|data-structures

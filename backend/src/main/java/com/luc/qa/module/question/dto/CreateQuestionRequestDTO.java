@@ -20,4 +20,7 @@ public class CreateQuestionRequestDTO {
     private String body;
 
     private boolean anonymous;
+
+    @Size(max = 20)
+    private String courseCode;
 }

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="017-create-mentorship-requests" author="luc">
+        <createTable tableName="mentorship_requests">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="student_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alumni_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="responded_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="mentorship_requests"
+            baseColumnNames="student_id"
+            constraintName="fk_mentorship_requests_student"
+            referencedTableName="users"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="mentorship_requests"
+            baseColumnNames="alumni_id"
+            constraintName="fk_mentorship_requests_alumni"
+            referencedTableName="users"
+            referencedColumnNames="id"/>
+
+        <sql>
+            ALTER TABLE mentorship_requests
+            ADD CONSTRAINT chk_mentorship_student_not_alumni
+            CHECK (student_id &lt;&gt; alumni_id);
+        </sql>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_mentorship_student_alumni_pending
+            ON mentorship_requests (student_id, alumni_id)
+            WHERE status = 'PENDING';
+        </sql>
+
+        <createIndex indexName="idx_mentorship_alumni_created" tableName="mentorship_requests">
+            <column name="alumni_id"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <createIndex indexName="idx_mentorship_student_created" tableName="mentorship_requests">
+            <column name="student_id"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

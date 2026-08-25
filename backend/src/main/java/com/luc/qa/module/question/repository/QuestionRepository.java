@@ -16,11 +16,32 @@ import org.springframework.data.repository.query.Param;
 public interface QuestionRepository
     extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question>, QuestionRepositoryCustom {
 
-    @EntityGraph(attributePaths = {"author", "community", "community.parent", "acceptedAnswer"})
+    @EntityGraph(attributePaths = {"author", "community", "community.parent", "acceptedAnswer", "course"})
     Optional<Question> findByIdAndStatusNot(Long id, QuestionStatus status);
+
+    @EntityGraph(attributePaths = {"author", "community", "course"})
+    List<Question> findByCourse_IdAndStatusNotOrderByCreatedAtDesc(Long courseId, QuestionStatus status);
 
     @EntityGraph(attributePaths = {"author", "community"})
     Page<Question> findAll(Specification<Question> spec, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"community"})
+    Page<Question> findByAuthor_IdAndAnonymousFalseAndStatusNot(
+        Long authorId,
+        QuestionStatus status,
+        Pageable pageable
+    );
+
+    long countByAuthor_IdAndAnonymousFalseAndStatusNot(Long authorId, QuestionStatus status);
+
+    @Query("""
+        SELECT COALESCE(SUM(q.score), 0)
+        FROM Question q
+        WHERE q.author.id = :authorId
+          AND q.anonymous = false
+          AND q.status <> com.luc.qa.module.question.entity.QuestionStatus.DELETED
+        """)
+    Long sumPublicScoreByAuthor(@Param("authorId") Long authorId);
 
     @Modifying
     @Query("UPDATE Question q SET q.viewCount = q.viewCount + 1 WHERE q.id = :id")

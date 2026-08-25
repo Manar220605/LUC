@@ -116,13 +116,74 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public PageResponseDTO<NotificationResponseDTO> listForCurrentUser(String keycloakId, int page, int size) {
-        User recipient = resolveUser(keycloakId);
-        Page<Notification> results = notificationRepository.findByRecipientIdOrderByCreatedAtDesc(
-            recipient.getId(),
-            PageRequest.of(page, size)
+    public void notifyMentorshipRequest(User student, User alumni, Long requestId) {
+        if (shouldSkip(student, alumni)) {
+            return;
+        }
+        saveNotification(
+            alumni,
+            student,
+            false,
+            NotificationType.MENTORSHIP_REQUEST,
+            null,
+            requestId,
+            null
         );
+    }
+
+    @Override
+    public void notifyMentorshipDecision(User alumni, User student, Long requestId, boolean accepted) {
+        if (shouldSkip(alumni, student)) {
+            return;
+        }
+        saveNotification(
+            student,
+            alumni,
+            false,
+            accepted ? NotificationType.MENTORSHIP_ACCEPTED : NotificationType.MENTORSHIP_DECLINED,
+            null,
+            requestId,
+            null
+        );
+    }
+
+    @Override
+    public void notifyNewQuestionInCommunity(
+        User author,
+        User follower,
+        Question question,
+        boolean authorAnonymous
+    ) {
+        if (shouldSkip(author, follower)) {
+            return;
+        }
+        saveNotification(
+            follower,
+            author,
+            authorAnonymous,
+            NotificationType.NEW_QUESTION_IN_COMMUNITY,
+            VoteTargetType.QUESTION,
+            question.getId(),
+            question
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDTO<NotificationResponseDTO> listForCurrentUser(
+        String keycloakId,
+        int page,
+        int size,
+        boolean unreadOnly
+    ) {
+        User recipient = resolveUser(keycloakId);
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<Notification> results = unreadOnly
+            ? notificationRepository.findByRecipientIdAndReadAtIsNullOrderByCreatedAtDesc(
+                recipient.getId(),
+                pageable
+            )
+            : notificationRepository.findByRecipientIdOrderByCreatedAtDesc(recipient.getId(), pageable);
 
         return PageResponseDTO.<NotificationResponseDTO>builder()
             .content(results.getContent().stream().map(notificationMapper::toResponse).toList())

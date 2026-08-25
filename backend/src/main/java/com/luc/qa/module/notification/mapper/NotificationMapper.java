@@ -45,6 +45,16 @@ public class NotificationMapper {
                 ? actorName + " upvoted your question"
                 : actorName + " upvoted your answer";
             case MENTION -> actorName + " mentioned you";
+            case MENTORSHIP_REQUEST -> actorName + " asked you to be a mentor";
+            case MENTORSHIP_ACCEPTED -> actorName + " accepted your mentorship request";
+            case MENTORSHIP_DECLINED -> actorName + " declined your mentorship request";
+            case NEW_QUESTION_IN_COMMUNITY -> {
+                String communityName = notification.getQuestion() != null
+                    && notification.getQuestion().getCommunity() != null
+                    ? notification.getQuestion().getCommunity().getName()
+                    : "a community you follow";
+                yield actorName + " posted a question in " + communityName;
+            }
         };
     }
 }

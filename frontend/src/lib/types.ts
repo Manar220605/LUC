@@ -42,6 +42,25 @@ export type CreateCommunityRequestDTO = {
   parentPath?: string;
 };
 
+export type FollowStatusDTO = {
+  following: boolean;
+  followerCount: number;
+};
+
+export type CommunityFollowResponseDTO = {
+  community: CommunityResponseDTO;
+  followedAt: string;
+};
+
+export type SaveStatusDTO = {
+  saved: boolean;
+};
+
+export type QuestionSaveResponseDTO = {
+  question: QuestionSummaryDTO;
+  savedAt: string;
+};
+
 export type UpdateCommunityRequestDTO = {
   name: string;
   description?: string;
@@ -54,6 +73,63 @@ export type PublicAuthorDTO = {
   avatarUrl?: string | null;
   gradYear?: number | null;
   currentPosition?: string | null;
+};
+
+export type PublicAlumniInfoDTO = {
+  gradYear: number;
+  faculty: Faculty;
+  degree: Degree;
+  major: string | null;
+  currentPosition: string | null;
+  currentCompany: string | null;
+  linkedinUrl: string | null;
+};
+
+export type PublicProfileQuestionDTO = {
+  id: number;
+  title: string;
+  communityPath: string;
+  communityName: string;
+  score: number;
+  answerCount: number;
+  createdAt: string;
+};
+
+export type PublicProfileAnswerDTO = {
+  id: number;
+  questionId: number;
+  questionTitle: string;
+  bodyPreview: string;
+  score: number;
+  createdAt: string;
+};
+
+export type PublicProfileDTO = {
+  id: number;
+  displayName: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  role: UserRole;
+  createdAt: string;
+  questionCount: number;
+  answerCount: number;
+  score: number;
+  alumni: PublicAlumniInfoDTO | null;
+  questions: PublicProfileQuestionDTO[];
+  answers: PublicProfileAnswerDTO[];
+};
+
+export type AlumniDirectoryEntryDTO = {
+  userId: number;
+  displayName: string;
+  avatarUrl: string | null;
+  gradYear: number;
+  faculty: Faculty;
+  degree: Degree;
+  major: string | null;
+  currentPosition: string | null;
+  currentCompany: string | null;
+  linkedinUrl: string | null;
 };
 
 export type Faculty =
@@ -184,7 +260,11 @@ export type PageResponseDTO<T> = {
 export type NotificationType =
   | 'ANSWER_ON_QUESTION'
   | 'UPVOTE'
-  | 'MENTION';
+  | 'MENTION'
+  | 'MENTORSHIP_REQUEST'
+  | 'MENTORSHIP_ACCEPTED'
+  | 'MENTORSHIP_DECLINED'
+  | 'NEW_QUESTION_IN_COMMUNITY';
 
 export type NotificationResponseDTO = {
   id: number;
@@ -202,9 +282,53 @@ export type UnreadCountResponseDTO = {
   count: number;
 };
 
+export type MentorshipRequestStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED';
+
+export type MentorshipRequestResponseDTO = {
+  id: number;
+  studentId: number;
+  studentDisplayName: string;
+  studentAvatarUrl: string | null;
+  alumniId: number;
+  alumniDisplayName: string;
+  alumniAvatarUrl: string | null;
+  alumniLinkedinUrl: string | null;
+  message: string;
+  status: MentorshipRequestStatus;
+  createdAt: string;
+  respondedAt: string | null;
+};
+
+export type MentorshipInboxDTO = {
+  incoming: MentorshipRequestResponseDTO[];
+  outgoing: MentorshipRequestResponseDTO[];
+};
+
+export type MentorshipStatusDTO = {
+  canRequest: boolean;
+  cannotRequestReason: string | null;
+  existing: MentorshipRequestResponseDTO | null;
+};
+
+export type CreateMentorshipRequestDTO = {
+  alumniUserId: number;
+  message: string;
+};
+
 export type RegisterStudentRequestDTO = {
-  fileNumber: string;
   email: string;
+  code: string;
+  password: string;
+  confirmPassword: string;
+};
+
+export type LookupStudentResponseDTO = {
+  message: string;
+};
+
+export type ForgotEmailResponseDTO = {
+  message: string;
+  maskedEmail?: string | null;
 };
 
 export type RegisterStudentResponseDTO = {

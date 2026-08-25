@@ -31,9 +31,10 @@ public class NotificationController {
     public PageResponseDTO<NotificationResponseDTO> list(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size,
+        @RequestParam(defaultValue = "false") boolean unreadOnly,
         @AuthenticationPrincipal Jwt jwt
     ) {
-        return notificationService.listForCurrentUser(jwt.getSubject(), page, size);
+        return notificationService.listForCurrentUser(jwt.getSubject(), page, size, unreadOnly);
     }
 
     @GetMapping("/unread-count")

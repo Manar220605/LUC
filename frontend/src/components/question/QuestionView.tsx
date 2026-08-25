@@ -6,8 +6,10 @@ import { getSession, useSession } from 'next-auth/react';
 import AnswerThread from '@/components/question/AnswerThread';
 import MarkdownContent from '@/components/markdown/MarkdownContent';
 import ReportButton from '@/components/moderation/ReportButton';
+import SaveQuestionButton from '@/components/question/SaveQuestionButton';
 import VoteControls from '@/components/vote/VoteControls';
 import AuthorBadge from '@/components/user/AuthorBadge';
+import AuthorName from '@/components/user/AuthorName';
 import type { QuestionResponseDTO } from '@/lib/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
@@ -115,7 +117,7 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
 
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
             <span className="flex flex-wrap items-center gap-2">
-              <span>{question.author.displayName}</span>
+              <AuthorName author={question.author} />
               <AuthorBadge author={question.author} />
             </span>
             <span>{new Date(question.createdAt).toLocaleString()}</span>
@@ -130,6 +132,7 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
       </article>
 
       <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
+        <SaveQuestionButton questionId={question.id} />
         <ReportButton targetType="QUESTION" targetId={question.id} />
         {question.author.id != null && (
           <ReportButton

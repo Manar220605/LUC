@@ -1,0 +1,36 @@
+slug,name,kind,description
+databases,Databases,TECHNICAL,Relational databases schema SQL queries and database design
+sql,SQL,TECHNICAL,Writing and debugging SQL queries joins keys and constraints
+operating-systems,Operating Systems,TECHNICAL,Processes memory files and OS concepts
+networks,Computer Networks,TECHNICAL,Routing TCP IP sockets and network protocols
+algorithms,Algorithms,TECHNICAL,Algorithm design complexity and problem solving
+data-structures,Data Structures,TECHNICAL,Lists trees graphs stacks queues and hashing
+java,Java,TECHNICAL,Java language object oriented programming and JVM
+oop,Object Oriented Programming,TECHNICAL,Classes inheritance polymorphism and design
+web-development,Web Development,TECHNICAL,HTML CSS JavaScript and building websites
+php,PHP,TECHNICAL,Server side web programming with PHP
+mobile-apps,Mobile Applications,TECHNICAL,Android or mobile app development
+software-engineering,Software Engineering,TECHNICAL,Requirements design testing and the software process
+computer-architecture,Computer Architecture,TECHNICAL,CPU memory digital logic and computer organization
+discrete-math,Discrete Mathematics,ACADEMIC,Logic sets graphs and discrete structures
+calculus,Calculus,ACADEMIC,Analysis limits derivatives and integrals
+linear-algebra,Linear Algebra,ACADEMIC,Vectors matrices and linear systems
+statistics,Statistics,ACADEMIC,Probability statistics and data analysis
+image-processing,Image Processing,TECHNICAL,Digital images filters and computer vision basics
+parallel-programming,Parallel Programming,TECHNICAL,Threads concurrency and parallel algorithms
+theory-of-computation,Theory of Computation,ACADEMIC,Automata grammars and computability
+machine-learning,Machine Learning,TECHNICAL,Supervised learning models and evaluation
+artificial-intelligence,Artificial Intelligence,TECHNICAL,Search knowledge and intelligent systems
+security,Computer Security,TECHNICAL,Security threats cryptography and safe systems
+linux,Linux,TECHNICAL,Linux command line processes and system tools
+graphs,Graphs,ACADEMIC,Graph theory and graph algorithms
+logic-programming,Logic Programming,TECHNICAL,Prolog and logic based programming
+internships,Internships,CAREER,Finding internships CVs and workplace experience
+interviews,Interviews,CAREER,Technical interviews and hiring process
+visas,Visas and mobility,MOBILITY,Student visas residence and working abroad papers
+erasmus,Erasmus and exchange,MOBILITY,Exchange programmes and studying in Europe
+masters-abroad,Masters abroad,MOBILITY,Choosing and applying to a masters programme
+project-management,IT Project Management,CAREER,Planning software projects and teamwork
+computer-and-society,Computer and Society,ACADEMIC,Ethics impact of computing and society
+human-rights,Human Rights,ACADEMIC,Human rights course in the LU programme
+git,Git and tools,TECHNICAL,Version control git and developer tools

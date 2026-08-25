@@ -37,12 +37,16 @@ public class SecurityConfig {
                     "/api/questions/**",
                     "/api/communities/**",
                     "/api/users/*/public-profile",
+                    "/api/alumni",
+                    "/api/courses",
+                    "/api/courses/**",
+                    "/api/uploads/avatars/**",
                     "/api/health/**",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html"
                 ).permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/register/student").permitAll()
+                .requestMatchers("/api/register/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

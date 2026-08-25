@@ -15,7 +15,4 @@ public class UpdateProfileRequestDTO {
 
     @Size(max = 5000)
     private String bio;
-
-    @Size(max = 500)
-    private String avatarUrl;
 }

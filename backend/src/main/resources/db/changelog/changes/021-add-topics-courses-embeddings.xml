@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="021-create-topics-courses-embeddings" author="luc">
+        <createTable tableName="topics">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="slug" type="VARCHAR(80)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="name" type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="courses">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(20)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="title" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="year_level" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="semester" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="credits" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="course_topics">
+            <column name="course_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="topic_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="course_topics" columnNames="course_id, topic_id" constraintName="pk_course_topics"/>
+        <addForeignKeyConstraint
+            baseTableName="course_topics"
+            baseColumnNames="course_id"
+            constraintName="fk_course_topics_course"
+            referencedTableName="courses"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="course_topics"
+            baseColumnNames="topic_id"
+            constraintName="fk_course_topics_topic"
+            referencedTableName="topics"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="question_topics">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="question_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="topic_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="confidence" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+            tableName="question_topics"
+            columnNames="question_id, topic_id"
+            constraintName="uk_question_topics_question_topic"/>
+        <addForeignKeyConstraint
+            baseTableName="question_topics"
+            baseColumnNames="question_id"
+            constraintName="fk_question_topics_question"
+            referencedTableName="questions"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="question_topics"
+            baseColumnNames="topic_id"
+            constraintName="fk_question_topics_topic"
+            referencedTableName="topics"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="user_expertise">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="topic_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weight" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="evidence_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="computed_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+            tableName="user_expertise"
+            columnNames="user_id, topic_id"
+            constraintName="uk_user_expertise_user_topic"/>
+        <addForeignKeyConstraint
+            baseTableName="user_expertise"
+            baseColumnNames="user_id"
+            constraintName="fk_user_expertise_user"
+            referencedTableName="users"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="user_expertise"
+            baseColumnNames="topic_id"
+            constraintName="fk_user_expertise_topic"
+            referencedTableName="topics"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addColumn tableName="questions">
+            <column name="course_id" type="BIGINT"/>
+            <column name="embedded_at" type="TIMESTAMP"/>
+        </addColumn>
+        <addForeignKeyConstraint
+            baseTableName="questions"
+            baseColumnNames="course_id"
+            constraintName="fk_questions_course"
+            referencedTableName="courses"
+            referencedColumnNames="id"
+            onDelete="SET NULL"/>
+        <createIndex indexName="idx_questions_course" tableName="questions">
+            <column name="course_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="021-add-embedding-columns" author="luc">
+        <sql>
+            ALTER TABLE topics ADD COLUMN embedding vector(384);
+            ALTER TABLE courses ADD COLUMN embedding vector(384);
+            ALTER TABLE questions ADD COLUMN embedding vector(384);
+            CREATE INDEX idx_topics_embedding ON topics USING hnsw (embedding vector_cosine_ops);
+            CREATE INDEX idx_courses_embedding ON courses USING hnsw (embedding vector_cosine_ops);
+            CREATE INDEX idx_questions_embedding ON questions USING hnsw (embedding vector_cosine_ops);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

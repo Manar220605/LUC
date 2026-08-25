@@ -10,6 +10,7 @@ import com.luc.qa.module.answer.entity.Answer;
 import com.luc.qa.module.answer.repository.AnswerRepository;
 import com.luc.qa.module.community.entity.Community;
 import com.luc.qa.module.community.repository.CommunityRepository;
+import com.luc.qa.module.community.service.CommunityFollowService;
 import com.luc.qa.module.feed.dto.FeedSort;
 import com.luc.qa.module.feed.service.FeedHotScore;
 import com.luc.qa.module.notification.service.NotificationService;
@@ -54,6 +55,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionMapper questionMapper;
     private final VoteService voteService;
     private final NotificationService notificationService;
+    private final CommunityFollowService communityFollowService;
 
     @Override
     @Transactional(readOnly = true)
@@ -216,6 +218,7 @@ public class QuestionServiceImpl implements QuestionService {
             saved.getId(),
             request.isAnonymous()
         );
+        communityFollowService.notifyFollowers(saved);
         return saved;
     }
 

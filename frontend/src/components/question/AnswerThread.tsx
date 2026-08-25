@@ -8,6 +8,7 @@ import VoteControls from '@/components/vote/VoteControls';
 import MarkdownContent from '@/components/markdown/MarkdownContent';
 import ReportButton from '@/components/moderation/ReportButton';
 import AuthorBadge from '@/components/user/AuthorBadge';
+import AuthorName from '@/components/user/AuthorName';
 import type {
   AnswerResponseDTO,
   AnswerTreeNodeDTO,
@@ -438,7 +439,7 @@ function AnswerNode({
             )}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
               <span className="flex flex-wrap items-center gap-2 font-medium text-gray-700">
-                <span>{answer.author.displayName}</span>
+                <AuthorName author={answer.author} />
                 <AuthorBadge author={answer.author} />
               </span>
               <span>{new Date(answer.createdAt).toLocaleString()}</span>

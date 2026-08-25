@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { getSession } from 'next-auth/react';
 import VoteControls from '@/components/vote/VoteControls';
 import AuthorBadge from '@/components/user/AuthorBadge';
+import AuthorName from '@/components/user/AuthorName';
 import type { PageResponseDTO, QuestionSummaryDTO } from '@/lib/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
@@ -83,7 +84,7 @@ export default function FeedList({ items: initialItems, feedQuery, emptyMessage 
                 {item.title}
               </Link>
               <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-600">
-                <span>{item.author.displayName}</span>
+                <AuthorName author={item.author} />
                 <AuthorBadge author={item.author} />
                 <span>
                   in{' '}
@@ -91,6 +92,14 @@ export default function FeedList({ items: initialItems, feedQuery, emptyMessage 
                     {item.communityName}
                   </Link>
                 </span>
+                {item.courseCode && (
+                  <Link
+                    href={`/courses/${encodeURIComponent(item.courseCode)}`}
+                    className="text-xs font-medium text-blue-700 hover:text-blue-900"
+                  >
+                    {item.courseCode}
+                  </Link>
+                )}
               </p>
               <p className="mt-1 text-xs text-gray-500">
                 {new Date(item.createdAt).toLocaleString()} · {item.answerCount} answers ·{' '}

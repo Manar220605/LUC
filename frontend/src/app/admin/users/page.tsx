@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { clientApiRequest } from '@/lib/clientApi';
@@ -254,7 +255,11 @@ export default function AdminUsersPage() {
               items.map((user) => (
                 <tr key={user.id}>
                   <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">{user.displayName}</div>
+                    <div className="font-medium text-gray-900">
+                      <Link href={`/profile/${user.id}`} className="hover:text-blue-700">
+                        {user.displayName}
+                      </Link>
+                    </div>
                     <div className="text-xs text-gray-500">{user.email}</div>
                   </td>
                   <td className="px-4 py-3">

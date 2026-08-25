@@ -15,6 +15,7 @@ import com.luc.qa.module.notification.service.NotificationService;
 import com.luc.qa.module.question.entity.Question;
 import com.luc.qa.module.question.repository.QuestionRepository;
 import com.luc.qa.module.question.service.QuestionService;
+import com.luc.qa.module.semantic.service.ExpertiseService;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.repository.UserRepository;
 import com.luc.qa.module.vote.entity.VoteTargetType;
@@ -40,6 +41,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerMapper answerMapper;
     private final VoteService voteService;
     private final NotificationService notificationService;
+    private final ExpertiseService expertiseService;
 
     @Override
     @Transactional(readOnly = true)
@@ -110,6 +112,7 @@ public class AnswerServiceImpl implements AnswerService {
             saved.getId(),
             request.isAnonymous()
         );
+        expertiseService.recomputeAll();
         return toOwnedResponse(reload(saved.getId()));
     }
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="016-weight-question-search-title" author="luc">
+        <comment>Rank title matches above body matches in full-text search.</comment>
+
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION questions_search_vector_trigger() RETURNS trigger AS $$
+            BEGIN
+              NEW.search_vector :=
+                setweight(to_tsvector('english', coalesce(NEW.title, '')), 'A')
+                || setweight(to_tsvector('english', coalesce(NEW.body, '')), 'B');
+              RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+
+        <sql>
+            UPDATE questions
+            SET search_vector =
+                setweight(to_tsvector('english', coalesce(title, '')), 'A')
+                || setweight(to_tsvector('english', coalesce(body, '')), 'B');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

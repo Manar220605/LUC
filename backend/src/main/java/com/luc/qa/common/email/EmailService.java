@@ -1,6 +1,7 @@
 package com.luc.qa.common.email;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
     private final JavaMailSender mailSender;
@@ -15,27 +17,18 @@ public class EmailService {
     @Value("${luc.mail.from:LUC <noreply@luc.local>}")
     private String fromAddress;
 
-    @Value("${luc.frontend-url:http://localhost:3000}")
-    private String frontendUrl;
-
-    public void sendStudentCredentials(String toEmail, String fullName, String password) {
+    public void sendStudentLookupCode(String toEmail, String firstName, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromAddress);
         message.setTo(toEmail);
-        message.setSubject("Your Lebanese University Connect account");
+        message.setSubject("Your LUC account activation code");
         message.setText("""
             Hello %s,
 
-            Your LUC student account has been created and verified.
+            Your LUC account activation code is: %s
 
-            Sign in at: %s/auth/signin
-            Email: %s
-            Temporary password: %s
-
-            Please sign in and change your password after your first login.
-
-            If you did not request this account, you can ignore this email.
-            """.formatted(fullName, frontendUrl, toEmail, password));
+            It expires in 10 minutes. If you did not request this, you can ignore this email.
+            """.formatted(firstName, code));
         mailSender.send(message);
     }
 }

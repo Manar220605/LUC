@@ -12,26 +12,63 @@ import type {
   CreateQuestionRequestDTO,
 } from '@/lib/types';
 
-export default function NewQuestionForm() {
+type Props = {
+  initialCommunityPath?: string;
+};
+
+function pathExists(nodes: CommunityTreeNodeDTO[], path: string): boolean {
+  for (const node of nodes) {
+    if (node.path === path) {
+      return true;
+    }
+    if (node.children.length > 0 && pathExists(node.children, path)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function communityName(nodes: CommunityTreeNodeDTO[], path: string): string | null {
+  for (const node of nodes) {
+    if (node.path === path) {
+      return node.name;
+    }
+    if (node.children.length > 0) {
+      const nested = communityName(node.children, path);
+      if (nested) {
+        return nested;
+      }
+    }
+  }
+  return null;
+}
+
+export default function NewQuestionForm({ initialCommunityPath }: Props) {
   const router = useRouter();
   const [tree, setTree] = useState<CommunityTreeNodeDTO[]>([]);
-  const [communityPath, setCommunityPath] = useState('cs');
+  const [communityPath, setCommunityPath] = useState(initialCommunityPath?.trim() || 'cs');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [anonymous, setAnonymous] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const lockedPath = initialCommunityPath?.trim() || '';
+  const lockedName = lockedPath ? communityName(tree, lockedPath) : null;
+  const communityLocked = Boolean(lockedPath && (tree.length === 0 || lockedName));
 
   useEffect(() => {
     apiPublicGet<CommunityTreeNodeDTO[]>('/api/communities')
       .then((data) => {
         setTree(data);
-        if (data.length > 0) {
+        const preferred = initialCommunityPath?.trim();
+        if (preferred && pathExists(data, preferred)) {
+          setCommunityPath(preferred);
+        } else if (data.length > 0) {
           setCommunityPath(data[0].path);
         }
       })
       .catch(() => setError('Failed to load communities'));
-  }, []);
+  }, [initialCommunityPath]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -48,7 +85,7 @@ export default function NewQuestionForm() {
       }
 
       const payload: CreateQuestionRequestDTO = {
-        communityPath,
+        communityPath: lockedPath || communityPath,
         title: title.trim(),
         body: body.trim(),
         anonymous,
@@ -79,7 +116,11 @@ export default function NewQuestionForm() {
         <label htmlFor="community" className="block text-sm font-medium text-gray-700">
           Community
         </label>
-        {tree.length > 0 ? (
+        {communityLocked ? (
+          <p className="mt-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+            {lockedName ? `${lockedName} (c/${lockedPath})` : `c/${lockedPath}`}
+          </p>
+        ) : tree.length > 0 ? (
           <CommunityPicker nodes={tree} value={communityPath} onChange={setCommunityPath} />
         ) : (
           <p className="mt-1 text-sm text-gray-500">Loading communities…</p>

@@ -29,7 +29,18 @@ public interface NotificationService {
         boolean actorAnonymous
     );
 
-    PageResponseDTO<NotificationResponseDTO> listForCurrentUser(String keycloakId, int page, int size);
+    void notifyMentorshipRequest(User student, User alumni, Long requestId);
+
+    void notifyMentorshipDecision(User alumni, User student, Long requestId, boolean accepted);
+
+    void notifyNewQuestionInCommunity(User author, User follower, Question question, boolean authorAnonymous);
+
+    PageResponseDTO<NotificationResponseDTO> listForCurrentUser(
+        String keycloakId,
+        int page,
+        int size,
+        boolean unreadOnly
+    );
 
     UnreadCountResponseDTO getUnreadCount(String keycloakId);
 

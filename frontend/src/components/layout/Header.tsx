@@ -17,6 +17,36 @@ export default function Header() {
         <Link href="/" className="shrink-0 text-lg font-semibold text-gray-900">
           Lebanese University Connect
         </Link>
+        <Link
+          href="/alumni"
+          className="shrink-0 text-sm font-medium text-gray-700 hover:text-blue-700"
+        >
+          Alumni
+        </Link>
+        {session?.user && (
+          <Link
+            href="/following"
+            className="shrink-0 text-sm font-medium text-gray-700 hover:text-blue-700"
+          >
+            Following
+          </Link>
+        )}
+        {session?.user && (
+          <Link
+            href="/saved"
+            className="shrink-0 text-sm font-medium text-gray-700 hover:text-blue-700"
+          >
+            Saved
+          </Link>
+        )}
+        {session?.user && (
+          <Link
+            href="/mentorship"
+            className="shrink-0 text-sm font-medium text-gray-700 hover:text-blue-700"
+          >
+            Mentorship
+          </Link>
+        )}
 
         <QuestionSearchBox action="global" className="min-w-[12rem] flex-1" />
 

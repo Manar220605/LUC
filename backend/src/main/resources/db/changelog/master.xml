@@ -17,5 +17,10 @@
     <include file="changes/010-add-notifications.xml" relativeToChangelogFile="true"/>
     <include file="changes/011-rename-upvote-notification-type.xml" relativeToChangelogFile="true"/>
     <include file="changes/012-add-student-directory.xml" relativeToChangelogFile="true"/>
+    <include file="changes/015-add-student-lookup-challenges.xml" relativeToChangelogFile="true"/>
+    <include file="changes/016-weight-question-search-title.xml" relativeToChangelogFile="true"/>
+    <include file="changes/017-add-mentorship-requests.xml" relativeToChangelogFile="true"/>
+    <include file="changes/018-add-community-follows.xml" relativeToChangelogFile="true"/>
+    <include file="changes/019-add-question-saves.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

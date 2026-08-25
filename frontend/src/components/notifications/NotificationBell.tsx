@@ -4,7 +4,11 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { clientApiRequest } from '@/lib/clientApi';
-import { formatNotificationTime, notificationHref } from '@/lib/notification';
+import {
+  notifyNotificationsRead,
+  onNotificationsRead,
+} from '@/lib/notification';
+import NotificationRow from '@/components/notifications/NotificationRow';
 import type {
   NotificationResponseDTO,
   PageResponseDTO,
@@ -12,6 +16,15 @@ import type {
 } from '@/lib/types';
 
 const POLL_INTERVAL_MS = 30_000;
+
+function markRead(
+  items: NotificationResponseDTO[],
+  id?: number
+): NotificationResponseDTO[] {
+  return items.map((item) =>
+    id == null || item.id === id ? { ...item, read: true } : item
+  );
+}
 
 export default function NotificationBell() {
   const { status } = useSession();
@@ -61,11 +74,15 @@ export default function NotificationBell() {
     return () => window.clearInterval(interval);
   }, [refreshUnreadCount]);
 
+  useEffect(() => onNotificationsRead(() => {
+    setUnreadCount(0);
+    setItems((current) => markRead(current));
+  }), []);
+
   useEffect(() => {
-    if (!open) {
-      return;
+    if (open) {
+      loadRecent().catch(() => undefined);
     }
-    loadRecent().catch(() => undefined);
   }, [open, loadRecent]);
 
   useEffect(() => {
@@ -89,11 +106,7 @@ export default function NotificationBell() {
           { method: 'POST' }
         );
         setUnreadCount((count) => Math.max(0, count - 1));
-        setItems((current) =>
-          current.map((item) =>
-            item.id === notification.id ? { ...item, read: true } : item
-          )
-        );
+        setItems((current) => markRead(current, notification.id));
       } catch {
         // navigation still works if mark-read fails
       }
@@ -105,7 +118,8 @@ export default function NotificationBell() {
     try {
       await clientApiRequest<void>('/api/notifications/read-all', { method: 'POST' });
       setUnreadCount(0);
-      setItems((current) => current.map((item) => ({ ...item, read: true })));
+      setItems((current) => markRead(current));
+      notifyNotificationsRead();
     } catch {
       // ignore
     }
@@ -114,6 +128,8 @@ export default function NotificationBell() {
   if (status !== 'authenticated') {
     return null;
   }
+
+  const hasUnread = items.some((item) => !item.read);
 
   return (
     <div ref={containerRef} className="relative">
@@ -148,7 +164,7 @@ export default function NotificationBell() {
         <div className="absolute right-0 z-20 mt-2 w-80 rounded-md border border-gray-200 bg-white shadow-lg">
           <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
             <h2 className="text-sm font-semibold text-gray-900">Notifications</h2>
-            {unreadCount > 0 && (
+            {hasUnread && (
               <button
                 type="button"
                 onClick={handleMarkAllRead}
@@ -165,34 +181,27 @@ export default function NotificationBell() {
             ) : items.length === 0 ? (
               <p className="px-4 py-6 text-sm text-gray-500">No notifications yet.</p>
             ) : (
-              <ul>
+              <ul className="divide-y divide-gray-100">
                 {items.map((notification) => (
                   <li key={notification.id}>
-                    <Link
-                      href={notificationHref(notification)}
+                    <NotificationRow
+                      notification={notification}
+                      compact
                       onClick={() => handleNotificationClick(notification)}
-                      className={`block px-4 py-3 hover:bg-gray-50 ${
-                        notification.read ? 'bg-white' : 'bg-blue-50/60'
-                      }`}
-                    >
-                      <p className="text-sm text-gray-900">{notification.message}</p>
-                      <p className="mt-1 text-xs text-gray-500">
-                        {formatNotificationTime(notification.createdAt)}
-                      </p>
-                    </Link>
+                    />
                   </li>
                 ))}
               </ul>
             )}
           </div>
 
-          <div className="border-t border-gray-100 px-4 py-2">
+          <div className="border-t border-gray-100 px-4 py-2 text-center">
             <Link
               href="/notifications"
               onClick={() => setOpen(false)}
               className="text-xs font-medium text-blue-600 hover:text-blue-800"
             >
-              View all notifications
+              View all
             </Link>
           </div>
         </div>

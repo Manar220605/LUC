@@ -13,6 +13,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final KeycloakAdminClient keycloakAdminClient;
+    private final AvatarStorage avatarStorage;
 
     @Override
     @Transactional(readOnly = true)
@@ -33,9 +35,29 @@ public class UserServiceImpl implements UserService {
     public User updateProfile(String keycloakId, UpdateProfileRequestDTO request) {
         User user = getByKeycloakId(keycloakId);
         user.setDisplayName(request.getDisplayName().trim());
-        user.setBio(request.getBio());
-        user.setAvatarUrl(request.getAvatarUrl());
+        user.setBio(blankToNull(request.getBio()));
         return userRepository.save(user);
+    }
+
+    @Override
+    public User updateAvatar(String keycloakId, MultipartFile file) {
+        User user = getByKeycloakId(keycloakId);
+        String previous = user.getAvatarUrl();
+        String storedUrl = avatarStorage.store(file);
+        user.setAvatarUrl(storedUrl);
+        User saved = userRepository.save(user);
+        avatarStorage.deleteIfStored(previous);
+        return saved;
+    }
+
+    @Override
+    public User clearAvatar(String keycloakId) {
+        User user = getByKeycloakId(keycloakId);
+        String previous = user.getAvatarUrl();
+        user.setAvatarUrl(null);
+        User saved = userRepository.save(user);
+        avatarStorage.deleteIfStored(previous);
+        return saved;
     }
 
     @Override
@@ -53,5 +75,12 @@ public class UserServiceImpl implements UserService {
         User saved = userRepository.save(user);
         keycloakAdminClient.assignRealmRole(user.getKeycloakId(), UserRole.STUDENT.name());
         return saved;
+    }
+
+    private static String blankToNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
     }
 }

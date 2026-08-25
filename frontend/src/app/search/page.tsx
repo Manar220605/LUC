@@ -25,7 +25,7 @@ export default async function SearchPage({ searchParams }: Props) {
     <main className="mx-auto max-w-4xl px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-900">Search questions</h1>
       <p className="mt-2 text-sm text-gray-600">
-        Full-text search across question titles and bodies.
+        Words in the title rank above the same words in the question body.
       </p>
 
       <div className="mt-6">
