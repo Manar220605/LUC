@@ -77,6 +77,16 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedStudents() {
+        // Drop unregistered mock rows so the CSV can redefine file numbers and emails.
+        var stale = studentDirectoryRepository.findAll().stream()
+            .filter(row -> !row.isRegistered())
+            .toList();
+        if (!stale.isEmpty()) {
+            studentDirectoryRepository.deleteAll(stale);
+            studentDirectoryRepository.flush();
+            log.info("Cleared {} unregistered mock student_directory rows before reseed", stale.size());
+        }
+
         ClassPathResource resource = new ClassPathResource(STUDENT_CSV);
         int inserted = 0;
         int updated = 0;

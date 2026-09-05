@@ -3,6 +3,7 @@ package com.luc.qa.module.moderation.controller;
 import com.luc.qa.module.moderation.dto.CreateReportRequestDTO;
 import com.luc.qa.module.moderation.dto.ReportResponseDTO;
 import com.luc.qa.module.moderation.service.ReportService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,10 @@ public class ReportController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Create content report",
+        description = "Submits a moderation report for content. Requires JWT authentication."
+    )
     public ReportResponseDTO create(
         @Valid @RequestBody CreateReportRequestDTO request,
         @AuthenticationPrincipal Jwt jwt

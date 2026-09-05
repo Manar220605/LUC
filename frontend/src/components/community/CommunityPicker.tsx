@@ -22,7 +22,7 @@ export default function CommunityPicker({ nodes, value, onChange }: Props) {
     <select
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+      className="mt-1 block w-full rounded-md border border-lu/20 px-3 py-2 text-sm"
       required
     >
       {options.map((option) => (

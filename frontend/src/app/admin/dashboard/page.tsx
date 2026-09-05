@@ -53,7 +53,7 @@ export default function AdminDashboardPage() {
   if (status === 'loading' || loading) {
     return (
       <main className="mx-auto max-w-5xl px-4 py-8">
-        <p className="text-gray-600">Loading dashboard…</p>
+        <p className="text-muted">Loading dashboard…</p>
       </main>
     );
   }
@@ -61,7 +61,7 @@ export default function AdminDashboardPage() {
   if (forbidden) {
     return (
       <main className="mx-auto max-w-5xl px-4 py-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Admin dashboard</h1>
+        <h1 className="text-2xl font-semibold text-lu-deep">Admin dashboard</h1>
         <p className="mt-4 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
           You do not have permission to view this page.
         </p>
@@ -71,8 +71,8 @@ export default function AdminDashboardPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900">Admin dashboard</h1>
-      <p className="mt-1 text-sm text-gray-600">Platform totals and moderation queue sizes.</p>
+      <h1 className="text-2xl font-semibold text-lu-deep">Admin dashboard</h1>
+      <p className="mt-1 text-sm text-muted">Platform totals and moderation queue sizes.</p>
 
       {error && (
         <p className="mt-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -85,13 +85,13 @@ export default function AdminDashboardPage() {
           {DASHBOARD_METRICS.map((metric) => (
             <article
               key={metric.key}
-              className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm"
+              className="rounded-lg border border-lu/10 bg-white p-5 shadow-sm"
             >
-              <p className="text-sm font-medium text-gray-500">{metric.label}</p>
-              <p className="mt-2 text-3xl font-semibold text-gray-900">
+              <p className="text-sm font-medium text-muted">{metric.label}</p>
+              <p className="mt-2 text-3xl font-semibold text-lu-deep">
                 {metrics[metric.key].toLocaleString()}
               </p>
-              <p className="mt-2 text-sm text-gray-600">{metric.description}</p>
+              <p className="mt-2 text-sm text-muted">{metric.description}</p>
             </article>
           ))}
         </section>

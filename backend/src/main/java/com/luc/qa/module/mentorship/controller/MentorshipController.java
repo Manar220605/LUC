@@ -5,6 +5,7 @@ import com.luc.qa.module.mentorship.dto.MentorshipInboxDTO;
 import com.luc.qa.module.mentorship.dto.MentorshipRequestResponseDTO;
 import com.luc.qa.module.mentorship.dto.MentorshipStatusDTO;
 import com.luc.qa.module.mentorship.service.MentorshipService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,10 @@ public class MentorshipController {
 
     @PostMapping("/requests")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Create mentorship request",
+        description = "Sends a mentorship request to another user. Requires JWT authentication."
+    )
     public MentorshipRequestResponseDTO create(
         @AuthenticationPrincipal Jwt jwt,
         @Valid @RequestBody CreateMentorshipRequestDTO request
@@ -39,11 +44,19 @@ public class MentorshipController {
     }
 
     @GetMapping("/requests")
+    @Operation(
+        summary = "List my mentorship requests",
+        description = "Returns the authenticated user's sent and received mentorship requests. Requires JWT authentication."
+    )
     public MentorshipInboxDTO listMine(@AuthenticationPrincipal Jwt jwt) {
         return mentorshipService.listMine(jwt.getSubject());
     }
 
     @GetMapping("/with/{userId}")
+    @Operation(
+        summary = "Get mentorship status with user",
+        description = "Returns mentorship relationship status between the current user and the given user. Requires JWT authentication."
+    )
     public MentorshipStatusDTO statusWith(
         @AuthenticationPrincipal Jwt jwt,
         @PathVariable Long userId
@@ -52,6 +65,10 @@ public class MentorshipController {
     }
 
     @PostMapping("/requests/{id}/accept")
+    @Operation(
+        summary = "Accept mentorship request",
+        description = "Accepts an incoming mentorship request. Requires JWT authentication."
+    )
     public MentorshipRequestResponseDTO accept(
         @AuthenticationPrincipal Jwt jwt,
         @PathVariable Long id
@@ -60,6 +77,10 @@ public class MentorshipController {
     }
 
     @PostMapping("/requests/{id}/decline")
+    @Operation(
+        summary = "Decline mentorship request",
+        description = "Declines an incoming mentorship request. Requires JWT authentication."
+    )
     public MentorshipRequestResponseDTO decline(
         @AuthenticationPrincipal Jwt jwt,
         @PathVariable Long id

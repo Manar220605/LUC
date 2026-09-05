@@ -7,6 +7,7 @@ import com.luc.qa.module.registration.dto.LookupStudentResponseDTO;
 import com.luc.qa.module.registration.dto.RegisterStudentRequestDTO;
 import com.luc.qa.module.registration.dto.RegisterStudentResponseDTO;
 import com.luc.qa.module.registration.service.StudentRegistrationService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -27,6 +28,10 @@ public class StudentRegistrationController {
     private final StudentRegistrationService studentRegistrationService;
 
     @PostMapping("/student/lookup")
+    @Operation(
+        summary = "Lookup student for registration",
+        description = "Starts student identity lookup for self-registration. Public endpoint; rate-limited by client IP."
+    )
     public LookupStudentResponseDTO lookupStudent(
         @Valid @RequestBody LookupStudentRequestDTO request,
         HttpServletRequest httpRequest
@@ -36,11 +41,19 @@ public class StudentRegistrationController {
 
     @PostMapping("/student")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+        summary = "Register student account",
+        description = "Completes student registration after a successful lookup. Public endpoint."
+    )
     public RegisterStudentResponseDTO registerStudent(@Valid @RequestBody RegisterStudentRequestDTO request) {
         return studentRegistrationService.register(request);
     }
 
     @PostMapping("/forgot-email")
+    @Operation(
+        summary = "Recover registration email",
+        description = "Helps a student recover their registration email. Public endpoint; rate-limited by client IP."
+    )
     public ForgotEmailResponseDTO forgotEmail(
         @Valid @RequestBody ForgotEmailRequestDTO request,
         HttpServletRequest httpRequest

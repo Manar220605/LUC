@@ -107,15 +107,15 @@ export default function AdminReportsPage() {
   if (status === 'loading' || loading) {
     return (
       <main className="mx-auto max-w-5xl px-4 py-8">
-        <p className="text-gray-600">Loading report queue…</p>
+        <p className="text-muted">Loading report queue…</p>
       </main>
     );
   }
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900">Moderation reports</h1>
-      <p className="mt-1 text-sm text-gray-600">
+      <h1 className="text-2xl font-semibold text-lu-deep">Moderation reports</h1>
+      <p className="mt-1 text-sm text-muted">
         Review user reports and resolve them with optional moderation actions.
       </p>
 
@@ -126,10 +126,10 @@ export default function AdminReportsPage() {
       )}
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <label className="text-sm text-gray-700">
+        <label className="text-sm text-ink">
           Status
           <select
-            className="ml-2 rounded border border-gray-300 px-2 py-1"
+            className="ml-2 rounded border border-lu/20 px-2 py-1"
             value={statusFilter}
             onChange={(event) => {
               setPage(0);
@@ -143,10 +143,10 @@ export default function AdminReportsPage() {
             ))}
           </select>
         </label>
-        <label className="text-sm text-gray-700">
+        <label className="text-sm text-ink">
           Target
           <select
-            className="ml-2 rounded border border-gray-300 px-2 py-1"
+            className="ml-2 rounded border border-lu/20 px-2 py-1"
             value={targetFilter}
             onChange={(event) => {
               setPage(0);
@@ -163,13 +163,13 @@ export default function AdminReportsPage() {
       </div>
 
       {resolveId != null && (
-        <section className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-          <h2 className="text-lg font-medium text-gray-900">Resolve report #{resolveId}</h2>
+        <section className="mt-6 rounded-lg border border-lu/20 bg-lu-soft p-4">
+          <h2 className="text-lg font-medium text-lu-deep">Resolve report #{resolveId}</h2>
           <form onSubmit={handleResolve} className="mt-3 grid gap-3">
             <fieldset className="space-y-2">
-              <legend className="text-sm font-medium text-gray-700">Action</legend>
+              <legend className="text-sm font-medium text-ink">Action</legend>
               {RESOLUTION_ACTIONS.map((option) => (
-                <label key={option.value} className="flex items-start gap-2 text-sm text-gray-700">
+                <label key={option.value} className="flex items-start gap-2 text-sm text-ink">
                   <input
                     type="radio"
                     name="resolutionAction"
@@ -179,7 +179,7 @@ export default function AdminReportsPage() {
                   />
                   <span>
                     <span className="font-medium">{option.label}</span>
-                    <span className="block text-gray-500">{option.hint}</span>
+                    <span className="block text-muted">{option.hint}</span>
                   </span>
                 </label>
               ))}
@@ -187,7 +187,7 @@ export default function AdminReportsPage() {
             <label className="text-sm">
               Resolution note (optional)
               <textarea
-                className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+                className="mt-1 w-full rounded border border-lu/20 px-2 py-1"
                 rows={3}
                 value={resolutionNote}
                 onChange={(event) => setResolutionNote(event.target.value)}
@@ -197,7 +197,7 @@ export default function AdminReportsPage() {
               <button
                 type="submit"
                 disabled={actionId === resolveId}
-                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                className="rounded bg-lu px-4 py-2 text-sm font-medium text-white hover:bg-lu-dark disabled:opacity-50"
               >
                 Confirm resolve
               </button>
@@ -208,7 +208,7 @@ export default function AdminReportsPage() {
                   setResolutionNote('');
                   setResolutionAction('NONE');
                 }}
-                className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="rounded border border-lu/20 px-4 py-2 text-sm text-ink hover:bg-lu-soft"
               >
                 Cancel
               </button>
@@ -219,28 +219,28 @@ export default function AdminReportsPage() {
 
       <section className="mt-8">
         {items.length === 0 ? (
-          <p className="text-sm text-gray-500">No reports found.</p>
+          <p className="text-sm text-muted">No reports found.</p>
         ) : (
-          <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+          <ul className="divide-y divide-lu-soft rounded-lg border border-lu/10 bg-white">
             {items.map((item) => (
               <li key={item.id} className="px-4 py-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-lu-deep">
                       #{item.id} · {REPORT_TARGET_LABELS[item.targetType]} #{item.targetId} ·{' '}
                       {REPORT_REASON_LABELS[item.reason]}
                     </p>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-muted">
                       Reported by {item.reporterDisplayName} ({item.reporterEmail})
                     </p>
                     {item.details && (
-                      <p className="mt-2 text-sm text-gray-700">Details: {item.details}</p>
+                      <p className="mt-2 text-sm text-ink">Details: {item.details}</p>
                     )}
-                    <pre className="mt-3 whitespace-pre-wrap rounded border border-gray-100 bg-gray-50 p-3 text-sm text-gray-800">
+                    <pre className="mt-3 whitespace-pre-wrap rounded border border-lu-soft bg-lu-mist p-3 text-sm text-ink">
                       {item.targetPreview}
                     </pre>
                     {item.targetAuthor && (
-                      <p className="mt-2 text-sm text-gray-700">
+                      <p className="mt-2 text-sm text-ink">
                         Author: {item.targetAuthor.displayName} ({item.targetAuthor.email})
                         {item.targetAuthor.postedAnonymously && (
                           <span className="ml-2 rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
@@ -249,7 +249,7 @@ export default function AdminReportsPage() {
                         )}
                       </p>
                     )}
-                    <p className="mt-2 text-xs text-gray-500">
+                    <p className="mt-2 text-xs text-muted">
                       Submitted {new Date(item.createdAt).toLocaleString()} · Status: {item.status}
                       {item.resolvedAt && (
                         <>
@@ -260,13 +260,13 @@ export default function AdminReportsPage() {
                       )}
                     </p>
                     {item.resolutionNote && (
-                      <p className="mt-1 text-sm text-gray-600">Note: {item.resolutionNote}</p>
+                      <p className="mt-1 text-sm text-muted">Note: {item.resolutionNote}</p>
                     )}
                     <div className="mt-2 flex flex-wrap gap-3 text-sm">
                       {item.targetQuestionId != null && (
                         <Link
                           href={`/questions/${item.targetQuestionId}`}
-                          className="font-medium text-blue-600 hover:text-blue-800"
+                          className="font-medium text-lu hover:text-lu-dark"
                         >
                           Open question
                         </Link>
@@ -282,7 +282,7 @@ export default function AdminReportsPage() {
                         setResolutionAction('NONE');
                       }}
                       disabled={actionId === item.id}
-                      className="shrink-0 rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                      className="shrink-0 rounded bg-lu px-3 py-1.5 text-sm font-medium text-white hover:bg-lu-dark disabled:opacity-50"
                     >
                       Resolve
                     </button>
@@ -295,12 +295,12 @@ export default function AdminReportsPage() {
       </section>
 
       {totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-between text-sm text-gray-600">
+        <div className="mt-6 flex items-center justify-between text-sm text-muted">
           <button
             type="button"
             disabled={page === 0}
             onClick={() => setPage((current) => Math.max(0, current - 1))}
-            className="rounded border border-gray-300 px-3 py-1.5 disabled:opacity-50"
+            className="rounded border border-lu/20 px-3 py-1.5 disabled:opacity-50"
           >
             Previous
           </button>
@@ -311,7 +311,7 @@ export default function AdminReportsPage() {
             type="button"
             disabled={page + 1 >= totalPages}
             onClick={() => setPage((current) => current + 1)}
-            className="rounded border border-gray-300 px-3 py-1.5 disabled:opacity-50"
+            className="rounded border border-lu/20 px-3 py-1.5 disabled:opacity-50"
           >
             Next
           </button>

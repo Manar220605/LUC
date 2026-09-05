@@ -5,6 +5,7 @@ import com.luc.qa.module.moderation.dto.AdminReportFilterDTO;
 import com.luc.qa.module.moderation.dto.AdminReportResponseDTO;
 import com.luc.qa.module.moderation.dto.ResolveReportRequestDTO;
 import com.luc.qa.module.moderation.service.AdminReportService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,10 @@ public class AdminReportController {
     private final AdminReportService adminReportService;
 
     @GetMapping
+    @Operation(
+        summary = "List reports (admin)",
+        description = "Returns a paginated, filterable list of moderation reports. Requires ADMIN role."
+    )
     public PageResponseDTO<AdminReportResponseDTO> list(
         @ModelAttribute AdminReportFilterDTO filter
     ) {
@@ -36,6 +41,10 @@ public class AdminReportController {
     }
 
     @PostMapping("/{id}/resolve")
+    @Operation(
+        summary = "Resolve report (admin)",
+        description = "Resolves a moderation report with an admin decision. Requires ADMIN role."
+    )
     public AdminReportResponseDTO resolve(
         @PathVariable Long id,
         @AuthenticationPrincipal Jwt jwt,

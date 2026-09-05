@@ -3,6 +3,7 @@ package com.luc.qa.module.course.controller;
 import com.luc.qa.module.course.dto.CourseDetailDTO;
 import com.luc.qa.module.course.dto.CourseSummaryDTO;
 import com.luc.qa.module.course.service.CourseService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,19 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping
+    @Operation(
+        summary = "List courses",
+        description = "Returns all courses. Public endpoint."
+    )
     public List<CourseSummaryDTO> list() {
         return courseService.listAll();
     }
 
     @GetMapping("/{code}")
+    @Operation(
+        summary = "Get course by code",
+        description = "Returns course details by code. Optional JWT enriches viewer-specific fields."
+    )
     public CourseDetailDTO get(@PathVariable String code) {
         return courseService.getByCode(code, resolveKeycloakId());
     }

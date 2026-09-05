@@ -153,7 +153,7 @@ export default function AdminUsersPage() {
   if (status === 'loading' || loading) {
     return (
       <main className="mx-auto max-w-5xl px-4 py-8">
-        <p className="text-gray-600">Loading users…</p>
+        <p className="text-muted">Loading users…</p>
       </main>
     );
   }
@@ -161,7 +161,7 @@ export default function AdminUsersPage() {
   if (forbidden) {
     return (
       <main className="mx-auto max-w-5xl px-4 py-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
+        <h1 className="text-2xl font-semibold text-lu-deep">Users</h1>
         <p className="mt-4 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
           You do not have permission to view this page.
         </p>
@@ -171,8 +171,8 @@ export default function AdminUsersPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
-      <p className="mt-1 text-sm text-gray-600">Search, filter, and moderate platform users.</p>
+      <h1 className="text-2xl font-semibold text-lu-deep">Users</h1>
+      <p className="mt-1 text-sm text-muted">Search, filter, and moderate platform users.</p>
 
       {error && (
         <p className="mt-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -182,24 +182,24 @@ export default function AdminUsersPage() {
 
       <form onSubmit={handleSearch} className="mt-6 flex flex-wrap items-end gap-3">
         <div className="grow">
-          <label className="block text-xs font-medium text-gray-600">Search</label>
+          <label className="block text-xs font-medium text-muted">Search</label>
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Email or display name…"
-            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-md border border-lu/20 px-3 py-2 text-sm"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600">Role</label>
+          <label className="block text-xs font-medium text-muted">Role</label>
           <select
             value={roleFilter}
             onChange={(e) => {
               setRoleFilter(e.target.value as '' | UserRole);
               setPage(0);
             }}
-            className="mt-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="mt-1 rounded-md border border-lu/20 px-3 py-2 text-sm"
           >
             {ROLE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -209,14 +209,14 @@ export default function AdminUsersPage() {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600">Status</label>
+          <label className="block text-xs font-medium text-muted">Status</label>
           <select
             value={bannedFilter}
             onChange={(e) => {
               setBannedFilter(e.target.value as '' | 'true' | 'false');
               setPage(0);
             }}
-            className="mt-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="mt-1 rounded-md border border-lu/20 px-3 py-2 text-sm"
           >
             {BANNED_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -227,15 +227,15 @@ export default function AdminUsersPage() {
         </div>
         <button
           type="submit"
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-md bg-lu px-4 py-2 text-sm font-medium text-white hover:bg-lu-dark"
         >
           Apply
         </button>
       </form>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50 text-left text-xs font-medium uppercase text-gray-500">
+      <div className="mt-6 overflow-hidden rounded-lg border border-lu/10 bg-white">
+        <table className="min-w-full divide-y divide-lu-soft text-sm">
+          <thead className="bg-lu-mist text-left text-xs font-medium uppercase text-muted">
             <tr>
               <th className="px-4 py-3">User</th>
               <th className="px-4 py-3">Role</th>
@@ -244,10 +244,10 @@ export default function AdminUsersPage() {
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-lu-soft">
             {items.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-sm text-gray-500">
+                <td colSpan={5} className="px-4 py-6 text-center text-sm text-muted">
                   No users match the current filters.
                 </td>
               </tr>
@@ -255,15 +255,15 @@ export default function AdminUsersPage() {
               items.map((user) => (
                 <tr key={user.id}>
                   <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">
-                      <Link href={`/profile/${user.id}`} className="hover:text-blue-700">
+                    <div className="font-medium text-lu-deep">
+                      <Link href={`/profile/${user.id}`} className="hover:text-lu">
                         {user.displayName}
                       </Link>
                     </div>
-                    <div className="text-xs text-gray-500">{user.email}</div>
+                    <div className="text-xs text-muted">{user.email}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                    <span className="rounded bg-lu-soft px-2 py-0.5 text-xs font-medium text-ink">
                       {user.role}
                     </span>
                   </td>
@@ -274,7 +274,7 @@ export default function AdminUsersPage() {
                           Banned
                         </span>
                         {user.banReason && (
-                          <div className="mt-1 text-xs text-gray-500">{user.banReason}</div>
+                          <div className="mt-1 text-xs text-muted">{user.banReason}</div>
                         )}
                       </div>
                     ) : (
@@ -283,7 +283,7 @@ export default function AdminUsersPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-xs text-gray-500">
+                  <td className="px-4 py-3 text-xs text-muted">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -296,7 +296,7 @@ export default function AdminUsersPage() {
                           setRoleSelection(user.role);
                         }}
                         disabled={actionId === user.id}
-                        className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        className="rounded-md border border-lu/20 px-3 py-1 text-xs font-medium text-ink hover:bg-lu-soft disabled:opacity-50"
                       >
                         Change role
                       </button>
@@ -337,18 +337,18 @@ export default function AdminUsersPage() {
             type="button"
             disabled={page === 0}
             onClick={() => setPage((p) => Math.max(0, p - 1))}
-            className="rounded-md border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-md border border-lu/20 px-3 py-1 text-ink hover:bg-lu-soft disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-gray-500">
+          <span className="text-muted">
             Page {page + 1} of {totalPages}
           </span>
           <button
             type="button"
             disabled={page + 1 >= totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="rounded-md border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-md border border-lu/20 px-3 py-1 text-ink hover:bg-lu-soft disabled:opacity-50"
           >
             Next
           </button>
@@ -356,20 +356,20 @@ export default function AdminUsersPage() {
       )}
 
       {roleTargetId != null && (
-        <div className="fixed inset-0 z-20 flex items-center justify-center bg-gray-900/50 px-4">
+        <div className="fixed inset-0 z-20 flex items-center justify-center bg-lu-deep/50 px-4">
           <form
             onSubmit={submitRoleChange}
             className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg"
           >
-            <h2 className="text-lg font-semibold text-gray-900">Change role</h2>
-            <p className="mt-1 text-sm text-gray-600">
+            <h2 className="text-lg font-semibold text-lu-deep">Change role</h2>
+            <p className="mt-1 text-sm text-muted">
               This updates the user&apos;s role locally and syncs the Keycloak realm role.
             </p>
-            <label className="mt-4 block text-sm font-medium text-gray-700">New role</label>
+            <label className="mt-4 block text-sm font-medium text-ink">New role</label>
             <select
               value={roleSelection}
               onChange={(e) => setRoleSelection(e.target.value as UserRole)}
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-md border border-lu/20 px-3 py-2 text-sm"
             >
               {ROLE_OPTIONS.filter((o) => o.value !== '').map((o) => (
                 <option key={o.value} value={o.value}>
@@ -381,14 +381,14 @@ export default function AdminUsersPage() {
               <button
                 type="button"
                 onClick={() => setRoleTargetId(null)}
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="rounded-md border border-lu/20 px-3 py-2 text-sm text-ink hover:bg-lu-soft"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={roleSelection === roleTargetCurrent || actionId === roleTargetId}
-                className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                className="rounded-md bg-lu px-3 py-2 text-sm font-medium text-white hover:bg-lu-dark disabled:opacity-50"
               >
                 Save
               </button>
@@ -398,13 +398,13 @@ export default function AdminUsersPage() {
       )}
 
       {banTargetId != null && (
-        <div className="fixed inset-0 z-20 flex items-center justify-center bg-gray-900/50 px-4">
+        <div className="fixed inset-0 z-20 flex items-center justify-center bg-lu-deep/50 px-4">
           <form
             onSubmit={submitBan}
             className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg"
           >
-            <h2 className="text-lg font-semibold text-gray-900">Ban user</h2>
-            <p className="mt-1 text-sm text-gray-600">
+            <h2 className="text-lg font-semibold text-lu-deep">Ban user</h2>
+            <p className="mt-1 text-sm text-muted">
               Provide a reason. This will be visible to the user and other admins.
             </p>
             <textarea
@@ -412,7 +412,7 @@ export default function AdminUsersPage() {
               onChange={(e) => setBanReason(e.target.value)}
               required
               rows={4}
-              className="mt-4 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              className="mt-4 w-full rounded-md border border-lu/20 px-3 py-2 text-sm"
               placeholder="Reason for ban…"
             />
             <div className="mt-4 flex justify-end gap-2">
@@ -422,7 +422,7 @@ export default function AdminUsersPage() {
                   setBanTargetId(null);
                   setBanReason('');
                 }}
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="rounded-md border border-lu/20 px-3 py-2 text-sm text-ink hover:bg-lu-soft"
               >
                 Cancel
               </button>

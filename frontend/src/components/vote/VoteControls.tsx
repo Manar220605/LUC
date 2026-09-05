@@ -117,13 +117,13 @@ export default function VoteControls({
         onClick={() => handleVote(1)}
         className={`rounded px-2 py-1 text-sm font-semibold ${
           viewerVote === 1
-            ? 'bg-orange-100 text-orange-700'
-            : 'text-gray-500 hover:bg-gray-100 hover:text-orange-600'
+            ? 'bg-lu text-white'
+            : 'text-muted hover:bg-lu-soft hover:text-lu'
         } disabled:cursor-not-allowed disabled:opacity-50`}
       >
         ↑
       </button>
-      <span className="text-sm font-semibold text-gray-800">{score}</span>
+      <span className="text-sm font-semibold text-lu-deep">{score}</span>
       <button
         type="button"
         aria-label="Downvote"
@@ -131,8 +131,8 @@ export default function VoteControls({
         onClick={() => handleVote(-1)}
         className={`rounded px-2 py-1 text-sm font-semibold ${
           viewerVote === -1
-            ? 'bg-blue-100 text-blue-700'
-            : 'text-gray-500 hover:bg-gray-100 hover:text-blue-600'
+            ? 'bg-lu-soft text-lu-dark'
+            : 'text-muted hover:bg-lu-soft hover:text-lu'
         } disabled:cursor-not-allowed disabled:opacity-50`}
       >
         ↓

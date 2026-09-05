@@ -5,6 +5,7 @@ import com.luc.qa.module.answer.dto.AnswerTreeNodeDTO;
 import com.luc.qa.module.answer.dto.CreateAnswerRequestDTO;
 import com.luc.qa.module.answer.dto.UpdateAnswerRequestDTO;
 import com.luc.qa.module.answer.service.AnswerService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -39,12 +40,20 @@ public class AnswerController {
     private final AnswerService answerService;
 
     @GetMapping("/questions/{questionId}/answers")
+    @Operation(
+        summary = "Get answer tree for a question",
+        description = "Returns nested answers for a question. Optional JWT enriches viewer-specific fields such as vote state."
+    )
     public List<AnswerTreeNodeDTO> getAnswers(@PathVariable Long questionId) {
         return answerService.getAnswerTree(questionId, resolveKeycloakId());
     }
 
     @PostMapping("/questions/{questionId}/answers")
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Create top-level answer",
+        description = "Posts a top-level answer on a question. Requires JWT authentication."
+    )
     public ResponseEntity<AnswerResponseDTO> createTopLevel(
         @PathVariable Long questionId,
         @Valid @RequestBody CreateAnswerRequestDTO request,
@@ -58,6 +67,10 @@ public class AnswerController {
 
     @PostMapping("/answers/{id}/replies")
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Reply to an answer",
+        description = "Creates a reply under an existing answer. Requires JWT authentication."
+    )
     public ResponseEntity<AnswerResponseDTO> createReply(
         @PathVariable Long id,
         @Valid @RequestBody CreateAnswerRequestDTO request,
@@ -71,6 +84,10 @@ public class AnswerController {
 
     @PutMapping("/answers/{id}")
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Update answer",
+        description = "Updates an answer. Requires JWT authentication; caller must own the answer."
+    )
     public AnswerResponseDTO update(
         @PathVariable Long id,
         @Valid @RequestBody UpdateAnswerRequestDTO request,
@@ -82,6 +99,10 @@ public class AnswerController {
     @DeleteMapping("/answers/{id}")
     @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+        summary = "Soft-delete answer",
+        description = "Soft-deletes an answer. Requires JWT authentication; caller must own the answer."
+    )
     public void delete(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
         answerService.softDelete(id, jwt.getSubject());
     }

@@ -3,6 +3,7 @@ package com.luc.qa.module.vote.controller;
 import com.luc.qa.module.vote.dto.CastVoteRequestDTO;
 import com.luc.qa.module.vote.dto.VoteResponseDTO;
 import com.luc.qa.module.vote.service.VoteService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,10 @@ public class VoteController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Cast or change a vote",
+        description = "Creates or updates a vote on a question or answer. Requires JWT authentication."
+    )
     public VoteResponseDTO castVote(
         @Valid @RequestBody CastVoteRequestDTO request,
         @AuthenticationPrincipal Jwt jwt

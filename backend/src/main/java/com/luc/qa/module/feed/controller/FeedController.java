@@ -4,6 +4,7 @@ import com.luc.qa.common.pagination.PageResponseDTO;
 import com.luc.qa.module.feed.dto.FeedSort;
 import com.luc.qa.module.feed.service.FeedService;
 import com.luc.qa.module.question.dto.QuestionSummaryDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,12 @@ public class FeedController {
     private final FeedService feedService;
 
     @GetMapping
+    @Operation(
+        summary = "Get question feed",
+        description = "Returns a paginated question feed. Optional JWT enriches viewer-specific fields. "
+            + "Query params: sort (default NEW), community path filter, includeDescendants (default true), "
+            + "search text, page (default 0), size (default 20)."
+    )
     public PageResponseDTO<QuestionSummaryDTO> getFeed(
         @RequestParam(defaultValue = "NEW") FeedSort sort,
         @RequestParam(required = false) String community,

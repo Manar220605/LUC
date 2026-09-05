@@ -54,11 +54,11 @@ export default function FeedList({ items: initialItems, feedQuery, emptyMessage 
   }, [feedQuery]);
 
   if (items.length === 0) {
-    return <p className="text-sm text-gray-500">{emptyMessage}</p>;
+    return <p className="text-sm text-muted">{emptyMessage}</p>;
   }
 
   return (
-    <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+    <ul className="divide-y divide-lu-soft overflow-hidden rounded-2xl border border-lu/10 bg-white shadow-[0_8px_30px_rgba(22,50,86,0.06)]">
       {items.map((item) => (
         <li key={item.id} className="px-4 py-4">
           <div className="flex items-start gap-4">
@@ -79,29 +79,29 @@ export default function FeedList({ items: initialItems, feedQuery, emptyMessage 
             <div className="min-w-0 flex-1">
               <Link
                 href={`/questions/${item.id}`}
-                className="text-base font-semibold text-gray-900 hover:text-blue-700"
+                className="text-base font-semibold text-lu-deep hover:text-lu"
               >
                 {item.title}
               </Link>
-              <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-600">
+              <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
                 <AuthorName author={item.author} />
                 <AuthorBadge author={item.author} />
                 <span>
                   in{' '}
-                  <Link href={`/c/${item.communityPath}`} className="hover:text-blue-700">
+                  <Link href={`/c/${item.communityPath}`} className="text-lu hover:text-lu-dark">
                     {item.communityName}
                   </Link>
                 </span>
                 {item.courseCode && (
                   <Link
                     href={`/courses/${encodeURIComponent(item.courseCode)}`}
-                    className="text-xs font-medium text-blue-700 hover:text-blue-900"
+                    className="rounded-full bg-lu-soft px-2 py-0.5 text-xs font-medium text-lu"
                   >
                     {item.courseCode}
                   </Link>
                 )}
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted">
                 {new Date(item.createdAt).toLocaleString()} · {item.answerCount} answers ·{' '}
                 {item.viewCount} views
               </p>

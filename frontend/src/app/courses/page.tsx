@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { apiPublicGet } from '@/lib/apiPublic';
 import type { CourseSummaryDTO } from '@/lib/types';
+import { card, heading, pageNarrow, sectionTitle } from '@/lib/ui';
 
 export default async function CoursesPage() {
   const courses = await apiPublicGet<CourseSummaryDTO[]>('/api/courses');
@@ -13,31 +14,31 @@ export default async function CoursesPage() {
   const years = [...byYear.keys()].sort((a, b) => a - b);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900">Courses</h1>
-      <p className="mt-2 text-sm text-gray-600">
+    <main className={pageNarrow}>
+      <h1 className={heading}>Courses</h1>
+      <p className="mt-2 text-sm text-muted">
         Lebanese University Faculty of Sciences Computer Science licence. Open a course to see
-        questions about it and related posts LUC finds by meaning.
+        questions about it.
       </p>
 
       {years.length === 0 ? (
-        <p className="mt-8 text-sm text-gray-500">No courses yet.</p>
+        <p className="mt-8 text-sm text-muted">No courses yet.</p>
       ) : (
         years.map((year) => (
           <section key={year} className="mt-8">
-            <h2 className="text-lg font-semibold text-gray-900">Year {year}</h2>
-            <ul className="mt-3 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+            <h2 className={sectionTitle}>Year {year}</h2>
+            <ul className={`${card} mt-3 divide-y divide-lu-soft overflow-hidden`}>
               {(byYear.get(year) ?? []).map((course) => (
                 <li key={course.code}>
                   <Link
                     href={`/courses/${encodeURIComponent(course.code)}`}
-                    className="flex flex-wrap items-baseline justify-between gap-2 px-4 py-3 hover:bg-gray-50"
+                    className="flex flex-wrap items-baseline justify-between gap-2 px-4 py-3 transition hover:bg-lu-soft"
                   >
                     <span>
-                      <span className="font-mono text-sm text-blue-700">{course.code}</span>{' '}
-                      <span className="font-medium text-gray-900">{course.title}</span>
+                      <span className="font-mono text-sm font-semibold text-lu">{course.code}</span>{' '}
+                      <span className="font-medium text-lu-deep">{course.title}</span>
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted">
                       Semester {course.semester} · {course.credits} credits
                     </span>
                   </Link>

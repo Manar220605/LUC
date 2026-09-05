@@ -4,12 +4,12 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import FeedList from '@/components/question/FeedList';
 import QuestionSearchBox from '@/components/question/QuestionSearchBox';
 import type { QuestionSummaryDTO } from '@/lib/types';
+import { btnTab } from '@/lib/ui';
 import {
   FEED_SORTS,
   type FeedSort,
   buildFeedQuery,
   feedSortLabel,
-  parseFeedSort,
 } from '@/lib/feed';
 
 type Props = {
@@ -23,9 +23,7 @@ type Props = {
 };
 
 function tabClassName(active: boolean): string {
-  return active
-    ? 'rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white'
-    : 'rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100';
+  return btnTab(active);
 }
 
 export default function FeedPanel({

@@ -4,6 +4,7 @@ import com.luc.qa.module.question.dto.CreateSaveRequestDTO;
 import com.luc.qa.module.question.dto.QuestionSaveResponseDTO;
 import com.luc.qa.module.question.dto.SaveStatusDTO;
 import com.luc.qa.module.question.service.QuestionSaveService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -29,6 +30,10 @@ public class QuestionSaveController {
     private final QuestionSaveService questionSaveService;
 
     @PostMapping
+    @Operation(
+        summary = "Save a question",
+        description = "Bookmarks a question for the current user. Requires JWT authentication."
+    )
     public SaveStatusDTO save(
         @AuthenticationPrincipal Jwt jwt,
         @Valid @RequestBody CreateSaveRequestDTO request
@@ -37,6 +42,10 @@ public class QuestionSaveController {
     }
 
     @DeleteMapping
+    @Operation(
+        summary = "Unsave a question",
+        description = "Removes a question bookmark. Requires JWT authentication. Query param: questionId."
+    )
     public SaveStatusDTO unsave(
         @AuthenticationPrincipal Jwt jwt,
         @RequestParam Long questionId
@@ -45,11 +54,19 @@ public class QuestionSaveController {
     }
 
     @GetMapping
+    @Operation(
+        summary = "List saved questions",
+        description = "Returns all questions saved by the current user. Requires JWT authentication."
+    )
     public List<QuestionSaveResponseDTO> listMine(@AuthenticationPrincipal Jwt jwt) {
         return questionSaveService.listMine(jwt.getSubject());
     }
 
     @GetMapping("/status")
+    @Operation(
+        summary = "Check save status",
+        description = "Returns whether the current user has saved a given question. Requires JWT authentication. Query param: questionId."
+    )
     public SaveStatusDTO status(
         @AuthenticationPrincipal Jwt jwt,
         @RequestParam Long questionId

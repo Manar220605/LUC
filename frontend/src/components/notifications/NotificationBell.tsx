@@ -137,7 +137,7 @@ export default function NotificationBell() {
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
-        className="relative rounded-md border border-gray-300 p-2 text-gray-700 hover:bg-gray-50"
+        className="relative rounded-lg border border-white/25 bg-white/10 p-2 text-white hover:bg-white/20"
       >
         <svg
           viewBox="0 0 24 24"
@@ -161,14 +161,14 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-20 mt-2 w-80 rounded-md border border-gray-200 bg-white shadow-lg">
-          <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-            <h2 className="text-sm font-semibold text-gray-900">Notifications</h2>
+        <div className="absolute right-0 z-20 mt-2 w-80 overflow-hidden rounded-2xl border border-lu/10 bg-white text-ink shadow-xl">
+          <div className="flex items-center justify-between border-b border-lu-soft px-4 py-3">
+            <h2 className="text-sm font-semibold text-lu-deep">Notifications</h2>
             {hasUnread && (
               <button
                 type="button"
                 onClick={handleMarkAllRead}
-                className="text-xs font-medium text-blue-600 hover:text-blue-800"
+                className="text-xs font-medium text-lu hover:text-lu-dark"
               >
                 Mark all read
               </button>
@@ -177,11 +177,11 @@ export default function NotificationBell() {
 
           <div className="max-h-96 overflow-y-auto">
             {loading ? (
-              <p className="px-4 py-6 text-sm text-gray-500">Loading…</p>
+              <p className="px-4 py-6 text-sm text-muted">Loading…</p>
             ) : items.length === 0 ? (
-              <p className="px-4 py-6 text-sm text-gray-500">No notifications yet.</p>
+              <p className="px-4 py-6 text-sm text-muted">No notifications yet.</p>
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-lu-soft">
                 {items.map((notification) => (
                   <li key={notification.id}>
                     <NotificationRow
@@ -195,11 +195,11 @@ export default function NotificationBell() {
             )}
           </div>
 
-          <div className="border-t border-gray-100 px-4 py-2 text-center">
+          <div className="border-t border-lu-soft px-4 py-2 text-center">
             <Link
               href="/notifications"
               onClick={() => setOpen(false)}
-              className="text-xs font-medium text-blue-600 hover:text-blue-800"
+              className="text-xs font-medium text-lu hover:text-lu-dark"
             >
               View all
             </Link>

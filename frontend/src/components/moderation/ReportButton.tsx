@@ -94,14 +94,14 @@ export default function ReportButton({
             role="dialog"
             aria-modal="true"
             aria-labelledby="report-dialog-title"
-            className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-5 shadow-xl"
+            className="w-full max-w-md rounded-lg border border-lu/10 bg-white p-5 shadow-xl"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 id="report-dialog-title" className="text-lg font-semibold text-gray-900">
+                <h2 id="report-dialog-title" className="text-lg font-semibold text-lu-deep">
                   Report content
                 </h2>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-muted">
                   Tell moderators why this should be reviewed.
                 </p>
               </div>
@@ -112,7 +112,7 @@ export default function ReportButton({
                   setError(null);
                   setSuccess(null);
                 }}
-                className="text-gray-500 hover:text-gray-800"
+                className="text-muted hover:text-ink"
                 aria-label="Close"
               >
                 ✕
@@ -130,7 +130,7 @@ export default function ReportButton({
                     setOpen(false);
                     setSuccess(null);
                   }}
-                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  className="rounded-md bg-lu px-4 py-2 text-sm font-medium text-white hover:bg-lu-dark"
                 >
                   Close
                 </button>
@@ -140,7 +140,7 @@ export default function ReportButton({
                 <label className="block text-sm">
                   Reason
                   <select
-                    className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+                    className="mt-1 w-full rounded border border-lu/20 px-3 py-2"
                     value={reason}
                     onChange={(event) => setReason(event.target.value as ReportReason)}
                     required
@@ -156,7 +156,7 @@ export default function ReportButton({
                 <label className="block text-sm">
                   Additional details (optional)
                   <textarea
-                    className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+                    className="mt-1 w-full rounded border border-lu/20 px-3 py-2"
                     rows={4}
                     value={details}
                     onChange={(event) => setDetails(event.target.value)}
@@ -175,7 +175,7 @@ export default function ReportButton({
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="rounded-md border border-lu/20 px-4 py-2 text-sm text-ink hover:bg-lu-soft"
                   >
                     Cancel
                   </button>

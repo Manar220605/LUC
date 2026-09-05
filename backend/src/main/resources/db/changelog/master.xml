@@ -22,5 +22,7 @@
     <include file="changes/017-add-mentorship-requests.xml" relativeToChangelogFile="true"/>
     <include file="changes/018-add-community-follows.xml" relativeToChangelogFile="true"/>
     <include file="changes/019-add-question-saves.xml" relativeToChangelogFile="true"/>
+    <include file="changes/021-add-topics-courses-embeddings.xml" relativeToChangelogFile="true"/>
+    <include file="changes/022-add-announcements.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

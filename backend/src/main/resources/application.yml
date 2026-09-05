@@ -56,10 +56,6 @@ luc:
   uploads:
     dir: ${LUC_UPLOADS_DIR:uploads}
     max-avatar-bytes: ${LUC_UPLOADS_MAX_AVATAR_BYTES:2097152}
-  embedder:
-    url: ${LUC_EMBEDDER_URL:http://localhost:8088}
-    connect-timeout-ms: ${LUC_EMBEDDER_CONNECT_TIMEOUT_MS:2000}
-    read-timeout-ms: ${LUC_EMBEDDER_READ_TIMEOUT_MS:15000}
 
 springdoc:
   api-docs.path: /v3/api-docs

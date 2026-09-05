@@ -5,6 +5,7 @@ import com.luc.qa.module.user.dto.UpdateProfileRequestDTO;
 import com.luc.qa.module.user.dto.UserResponseDTO;
 import com.luc.qa.module.user.mapper.UserMapper;
 import com.luc.qa.module.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,12 +36,20 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Get current user profile",
+        description = "Returns the authenticated user's profile. Requires JWT authentication."
+    )
     public UserResponseDTO getMe(@AuthenticationPrincipal Jwt jwt) {
         return userMapper.toResponse(userService.getByKeycloakId(jwt.getSubject()));
     }
 
     @PutMapping
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Update current user profile",
+        description = "Updates profile fields for the authenticated user. Requires JWT authentication."
+    )
     public UserResponseDTO updateMe(
         @AuthenticationPrincipal Jwt jwt,
         @Valid @RequestBody UpdateProfileRequestDTO request
@@ -50,6 +59,10 @@ public class UserController {
 
     @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Upload avatar",
+        description = "Uploads a new avatar image (multipart form field: file). Requires JWT authentication."
+    )
     public UserResponseDTO uploadAvatar(
         @AuthenticationPrincipal Jwt jwt,
         @RequestParam("file") MultipartFile file
@@ -60,12 +73,20 @@ public class UserController {
     @DeleteMapping("/avatar")
     @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+        summary = "Delete avatar",
+        description = "Removes the current user's avatar. Requires JWT authentication."
+    )
     public void deleteAvatar(@AuthenticationPrincipal Jwt jwt) {
         userService.clearAvatar(jwt.getSubject());
     }
 
     @PostMapping("/onboarding")
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Complete onboarding",
+        description = "Completes first-time onboarding for the authenticated user. Requires JWT authentication."
+    )
     public UserResponseDTO onboarding(
         @AuthenticationPrincipal Jwt jwt,
         @Valid @RequestBody OnboardingRequestDTO request

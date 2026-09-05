@@ -13,6 +13,5 @@ public class CourseDetailDTO {
     private String description;
     private List<TopicSummaryDTO> topics;
     private List<QuestionSummaryDTO> linkedQuestions;
-    private List<QuestionSummaryDTO> relatedQuestions;
     private List<CourseExpertDTO> people;
 }

@@ -90,13 +90,13 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
   }, [questionId]);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
-      <p className="text-sm text-gray-500">
-        <Link href="/" className="hover:text-blue-700">
-          Feed
+    <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <p className="text-sm text-muted">
+        <Link href="/" className="text-lu hover:text-lu-dark">
+          Home
         </Link>
         {' / '}
-        <Link href={`/c/${question.community.path}`} className="hover:text-blue-700">
+        <Link href={`/c/${question.community.path}`} className="text-lu hover:text-lu-dark">
           {question.community.name}
         </Link>
       </p>
@@ -113,9 +113,11 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
           }}
         />
         <div className="min-w-0 flex-1">
-          <h1 className="text-3xl font-bold text-gray-900">{question.title}</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-lu-deep">
+            {question.title}
+          </h1>
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
             <span className="flex flex-wrap items-center gap-2">
               <AuthorName author={question.author} />
               <AuthorBadge author={question.author} />
@@ -127,7 +129,7 @@ export default function QuestionView({ question: initialQuestion, questionId }: 
         </div>
       </div>
 
-      <article className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
+      <article className="mt-6 rounded-2xl border border-lu/10 bg-white p-6 shadow-[0_8px_30px_rgba(22,50,86,0.06)]">
         <MarkdownContent content={question.body} />
       </article>
 

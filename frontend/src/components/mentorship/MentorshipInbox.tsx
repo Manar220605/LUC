@@ -48,16 +48,16 @@ function RequestCard({
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/profile/${otherId}`}
-              className="font-semibold text-gray-900 hover:text-blue-700"
+              className="font-semibold text-lu-deep hover:text-lu"
             >
               {otherName}
             </Link>
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+            <span className="rounded-full bg-lu-soft px-2 py-0.5 text-xs font-medium text-ink">
               {statusLabel(request.status)}
             </span>
           </div>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-gray-800">{request.message}</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-2 whitespace-pre-wrap text-sm text-ink">{request.message}</p>
+          <p className="mt-1 text-xs text-muted">
             {new Date(request.createdAt).toLocaleString()}
           </p>
           {side === 'outgoing' &&
@@ -68,7 +68,7 @@ function RequestCard({
                   href={request.alumniLinkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-medium text-blue-700 hover:text-blue-800"
+                  className="text-sm font-medium text-lu hover:text-lu-dark"
                 >
                   LinkedIn
                 </a>
@@ -80,7 +80,7 @@ function RequestCard({
                 type="button"
                 disabled={busy}
                 onClick={() => onRespond(request.id, 'accept')}
-                className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                className="rounded-md bg-lu px-3 py-1.5 text-sm font-medium text-white hover:bg-lu-dark disabled:opacity-50"
               >
                 Accept
               </button>
@@ -88,7 +88,7 @@ function RequestCard({
                 type="button"
                 disabled={busy}
                 onClick={() => onRespond(request.id, 'decline')}
-                className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                className="rounded-md border border-lu/20 px-3 py-1.5 text-sm font-medium text-ink hover:bg-lu-soft disabled:opacity-50"
               >
                 Decline
               </button>
@@ -147,7 +147,7 @@ export default function MentorshipInbox() {
   if (status === 'loading' || status === 'unauthenticated') {
     return (
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-muted">Loading…</p>
       </main>
     );
   }
@@ -158,8 +158,8 @@ export default function MentorshipInbox() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900">Mentorship</h1>
-      <p className="mt-2 text-sm text-gray-600">
+      <h1 className="text-3xl font-bold text-lu-deep">Mentorship</h1>
+      <p className="mt-2 text-sm text-muted">
         Students can ask alumni for mentorship. Alumni accept or decline. There is no private chat —
         if you accept, the student can reach you on LinkedIn when you shared it.
       </p>
@@ -167,11 +167,11 @@ export default function MentorshipInbox() {
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
       {loading ? (
-        <p className="mt-6 text-sm text-gray-500">Loading requests…</p>
+        <p className="mt-6 text-sm text-muted">Loading requests…</p>
       ) : empty ? (
-        <p className="mt-6 text-sm text-gray-500">
+        <p className="mt-6 text-sm text-muted">
           No mentorship requests yet.{' '}
-          <Link href="/alumni" className="font-medium text-blue-700 hover:text-blue-800">
+          <Link href="/alumni" className="font-medium text-lu hover:text-lu-dark">
             Browse alumni
           </Link>
           .
@@ -180,8 +180,8 @@ export default function MentorshipInbox() {
         <>
           {incoming.length > 0 && (
             <section className="mt-8">
-              <h2 className="text-lg font-semibold text-gray-900">Requests you received</h2>
-              <ul className="mt-3 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+              <h2 className="text-lg font-semibold text-lu-deep">Requests you received</h2>
+              <ul className="mt-3 divide-y divide-lu-soft rounded-lg border border-lu/10 bg-white">
                 {incoming.map((request) => (
                   <RequestCard
                     key={request.id}
@@ -196,8 +196,8 @@ export default function MentorshipInbox() {
           )}
           {outgoing.length > 0 && (
             <section className="mt-8">
-              <h2 className="text-lg font-semibold text-gray-900">Requests you sent</h2>
-              <ul className="mt-3 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+              <h2 className="text-lg font-semibold text-lu-deep">Requests you sent</h2>
+              <ul className="mt-3 divide-y divide-lu-soft rounded-lg border border-lu/10 bg-white">
                 {outgoing.map((request) => (
                   <RequestCard
                     key={request.id}

@@ -5,6 +5,7 @@ import com.luc.qa.module.community.dto.CreateCommunityRequestDTO;
 import com.luc.qa.module.community.dto.UpdateCommunityRequestDTO;
 import com.luc.qa.module.community.mapper.CommunityMapper;
 import com.luc.qa.module.community.service.AdminCommunityService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -32,6 +33,10 @@ public class AdminCommunityController {
     private final CommunityMapper communityMapper;
 
     @PostMapping
+    @Operation(
+        summary = "Create community (admin)",
+        description = "Creates a new community node. Requires ADMIN role."
+    )
     public ResponseEntity<CommunityResponseDTO> create(@Valid @RequestBody CreateCommunityRequestDTO request) {
         var created = adminCommunityService.create(request);
         return ResponseEntity
@@ -40,6 +45,10 @@ public class AdminCommunityController {
     }
 
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Update community (admin)",
+        description = "Updates an existing community by id. Requires ADMIN role."
+    )
     public CommunityResponseDTO update(
         @PathVariable Long id,
         @Valid @RequestBody UpdateCommunityRequestDTO request
@@ -49,6 +58,10 @@ public class AdminCommunityController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+        summary = "Delete community (admin)",
+        description = "Deletes a community by id. Requires ADMIN role."
+    )
     public void delete(@PathVariable Long id) {
         adminCommunityService.delete(id);
     }

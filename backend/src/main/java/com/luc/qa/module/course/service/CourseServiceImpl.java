@@ -6,7 +6,6 @@ import com.luc.qa.module.alumni.repository.AlumniProfileRepository;
 import com.luc.qa.module.course.dto.CourseDetailDTO;
 import com.luc.qa.module.course.dto.CourseExpertDTO;
 import com.luc.qa.module.course.dto.CourseSummaryDTO;
-import com.luc.qa.module.course.dto.TopicSummaryDTO;
 import com.luc.qa.module.course.entity.Course;
 import com.luc.qa.module.course.mapper.CourseMapper;
 import com.luc.qa.module.course.repository.CourseRepository;
@@ -15,8 +14,6 @@ import com.luc.qa.module.question.entity.Question;
 import com.luc.qa.module.question.entity.QuestionStatus;
 import com.luc.qa.module.question.mapper.QuestionMapper;
 import com.luc.qa.module.question.repository.QuestionRepository;
-import com.luc.qa.module.semantic.store.EmbeddingStore;
-import com.luc.qa.module.semantic.store.ScoredId;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.entity.UserRole;
 import com.luc.qa.module.user.repository.UserRepository;
@@ -26,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CourseServiceImpl implements CourseService {
 
-    private static final int RELATED_LIMIT = 8;
     private static final int PEOPLE_LIMIT = 8;
 
     private final CourseRepository courseRepository;
@@ -47,7 +42,6 @@ public class CourseServiceImpl implements CourseService {
     private final QuestionRepository questionRepository;
     private final QuestionMapper questionMapper;
     private final VoteService voteService;
-    private final EmbeddingStore embeddingStore;
     private final JdbcTemplate jdbcTemplate;
     private final UserRepository userRepository;
     private final AlumniProfileRepository alumniProfileRepository;
@@ -71,21 +65,6 @@ public class CourseServiceImpl implements CourseService {
         );
         List<QuestionSummaryDTO> linkedDtos = toSummaries(linked, keycloakId);
 
-        List<QuestionSummaryDTO> relatedDtos = List.of();
-        float[] courseVector = embeddingStore.loadCourseEmbedding(course.getId());
-        if (courseVector != null) {
-            List<ScoredId> related = embeddingStore.relatedQuestions(
-                course.getId(),
-                courseVector,
-                RELATED_LIMIT
-            );
-            List<Long> ids = related.stream().map(ScoredId::id).toList();
-            Map<Long, Question> byId = questionRepository.findAllById(ids).stream()
-                .collect(Collectors.toMap(Question::getId, Function.identity()));
-            List<Question> ordered = ids.stream().map(byId::get).filter(Objects::nonNull).toList();
-            relatedDtos = toSummaries(ordered, keycloakId);
-        }
-
         return CourseDetailDTO.builder()
             .course(courseMapper.toSummary(course))
             .description(course.getDescription())
@@ -94,7 +73,6 @@ public class CourseServiceImpl implements CourseService {
                 .map(courseMapper::toTopicSummary)
                 .toList())
             .linkedQuestions(linkedDtos)
-            .relatedQuestions(relatedDtos)
             .people(loadPeople(course.getId()))
             .build();
     }

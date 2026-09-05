@@ -67,14 +67,14 @@ export default function SaveQuestionButton({ questionId }: Props) {
   }
 
   if (sessionStatus === 'loading' || loading) {
-    return <span className="text-sm text-gray-500">Loading…</span>;
+    return <span className="text-sm text-muted">Loading…</span>;
   }
 
   if (sessionStatus !== 'authenticated') {
     return (
       <Link
         href={`/auth/signin?callbackUrl=/questions/${questionId}`}
-        className="text-sm font-medium text-gray-600 hover:text-blue-700"
+        className="text-sm font-medium text-muted hover:text-lu"
       >
         Sign in to save
       </Link>
@@ -89,8 +89,8 @@ export default function SaveQuestionButton({ questionId }: Props) {
         disabled={busy}
         className={
           status?.saved
-            ? 'rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50'
-            : 'rounded-md border border-blue-600 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50'
+            ? 'rounded-md border border-lu/20 px-3 py-1.5 text-sm font-medium text-ink hover:bg-lu-soft disabled:opacity-50'
+            : 'rounded-md border border-lu px-3 py-1.5 text-sm font-medium text-lu hover:bg-lu-soft disabled:opacity-50'
         }
       >
         {busy ? 'Saving…' : status?.saved ? 'Saved' : 'Save'}

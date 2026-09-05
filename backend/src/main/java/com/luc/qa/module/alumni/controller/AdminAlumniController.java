@@ -6,6 +6,7 @@ import com.luc.qa.module.alumni.dto.AdminVerificationResponseDTO;
 import com.luc.qa.module.alumni.dto.ReviewVerificationRequestDTO;
 import com.luc.qa.module.alumni.dto.VerificationResponseDTO;
 import com.luc.qa.module.alumni.service.AdminAlumniService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,10 @@ public class AdminAlumniController {
     private final AdminAlumniService adminAlumniService;
 
     @GetMapping
+    @Operation(
+        summary = "List alumni verifications (admin)",
+        description = "Returns a paginated, filterable list of alumni verification requests. Requires ADMIN role."
+    )
     public PageResponseDTO<AdminVerificationResponseDTO> list(
         @ModelAttribute AdminVerificationFilterDTO filter
     ) {
@@ -37,6 +42,10 @@ public class AdminAlumniController {
     }
 
     @PostMapping("/{id}/approve")
+    @Operation(
+        summary = "Approve alumni verification (admin)",
+        description = "Approves an alumni verification request. Requires ADMIN role."
+    )
     public VerificationResponseDTO approve(
         @PathVariable Long id,
         @AuthenticationPrincipal Jwt jwt
@@ -45,6 +54,10 @@ public class AdminAlumniController {
     }
 
     @PostMapping("/{id}/reject")
+    @Operation(
+        summary = "Reject alumni verification (admin)",
+        description = "Rejects an alumni verification request with a review reason. Requires ADMIN role."
+    )
     public VerificationResponseDTO reject(
         @PathVariable Long id,
         @AuthenticationPrincipal Jwt jwt,

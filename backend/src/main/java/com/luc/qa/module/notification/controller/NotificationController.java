@@ -4,6 +4,7 @@ import com.luc.qa.common.pagination.PageResponseDTO;
 import com.luc.qa.module.notification.dto.NotificationResponseDTO;
 import com.luc.qa.module.notification.dto.UnreadCountResponseDTO;
 import com.luc.qa.module.notification.service.NotificationService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,10 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
+    @Operation(
+        summary = "List my notifications",
+        description = "Returns a paginated list of notifications for the authenticated user. Requires JWT authentication."
+    )
     public PageResponseDTO<NotificationResponseDTO> list(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size,
@@ -38,11 +43,19 @@ public class NotificationController {
     }
 
     @GetMapping("/unread-count")
+    @Operation(
+        summary = "Get unread notification count",
+        description = "Returns the unread notification count for the authenticated user. Requires JWT authentication."
+    )
     public UnreadCountResponseDTO unreadCount(@AuthenticationPrincipal Jwt jwt) {
         return notificationService.getUnreadCount(jwt.getSubject());
     }
 
     @PostMapping("/{id}/read")
+    @Operation(
+        summary = "Mark notification as read",
+        description = "Marks a single notification as read for the authenticated user. Requires JWT authentication."
+    )
     public NotificationResponseDTO markAsRead(
         @PathVariable Long id,
         @AuthenticationPrincipal Jwt jwt
@@ -52,6 +65,10 @@ public class NotificationController {
 
     @PostMapping("/read-all")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+        summary = "Mark all notifications as read",
+        description = "Marks all notifications as read for the authenticated user. Requires JWT authentication."
+    )
     public void markAllAsRead(@AuthenticationPrincipal Jwt jwt) {
         notificationService.markAllAsRead(jwt.getSubject());
     }

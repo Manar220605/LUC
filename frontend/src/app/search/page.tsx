@@ -22,9 +22,11 @@ export default async function SearchPage({ searchParams }: Props) {
     : { content: [], page: 0, size: 20, totalElements: 0, totalPages: 0 };
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900">Search questions</h1>
-      <p className="mt-2 text-sm text-gray-600">
+    <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-lu-deep sm:text-4xl">
+        Search questions
+      </h1>
+      <p className="mt-2 text-sm text-muted">
         Words in the title rank above the same words in the question body.
       </p>
 
@@ -34,13 +36,13 @@ export default async function SearchPage({ searchParams }: Props) {
 
       {hasQuery ? (
         <section className="mt-8">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted">
             {feed.totalElements === 0
               ? `No results for “${search}”.`
               : `${feed.totalElements} result${feed.totalElements === 1 ? '' : 's'} for “${search}”.`}
           </p>
           <div className="mt-4">
-            <Suspense fallback={<p className="text-sm text-gray-500">Loading results…</p>}>
+            <Suspense fallback={<p className="text-sm text-muted">Loading results…</p>}>
               <FeedPanel
                 items={feed.content}
                 sort={sort}
@@ -52,7 +54,7 @@ export default async function SearchPage({ searchParams }: Props) {
           </div>
         </section>
       ) : (
-        <p className="mt-8 text-sm text-gray-500">Enter a search term to find questions.</p>
+        <p className="mt-8 text-sm text-muted">Enter a search term to find questions.</p>
       )}
     </main>
   );

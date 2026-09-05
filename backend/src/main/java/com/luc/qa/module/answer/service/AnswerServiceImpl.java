@@ -15,7 +15,7 @@ import com.luc.qa.module.notification.service.NotificationService;
 import com.luc.qa.module.question.entity.Question;
 import com.luc.qa.module.question.repository.QuestionRepository;
 import com.luc.qa.module.question.service.QuestionService;
-import com.luc.qa.module.semantic.service.ExpertiseService;
+import com.luc.qa.module.topic.service.ExpertiseService;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.repository.UserRepository;
 import com.luc.qa.module.vote.entity.VoteTargetType;

@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useEffect } from 'react';
+import { btnPrimary, cardPad, heading, pageNarrow } from '@/lib/ui';
 
 export default function SignInPage() {
   useEffect(() => {
@@ -9,30 +11,39 @@ export default function SignInPage() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-16 text-center">
-      <h1 className="text-2xl font-semibold text-gray-900">Redirecting to sign in…</h1>
-        <p className="mt-2 text-gray-600">If you are not redirected, use the button below.</p>
-        <div className="mt-4 space-y-2 text-sm text-gray-600">
+    <main className={pageNarrow}>
+      <div className={`${cardPad} text-center`}>
+        <img src="/lu-logo.jpg" alt="" className="mx-auto h-16 w-16 rounded-lg object-contain" />
+        <h1 className={`${heading} mt-4`}>Redirecting to sign in…</h1>
+        <p className="mt-2 text-muted">If you are not redirected, use the button below.</p>
+        <div className="mt-4 space-y-2 text-sm text-muted">
           <p>
             New student?{' '}
-            <a href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-800">
+            <Link href="/auth/signup" className="font-medium text-lu hover:text-lu-dark">
               Sign up with your first-year email
-            </a>
+            </Link>
+          </p>
+          <p>
+            Alumni?{' '}
+            <Link href="/auth/alumni-signup" className="font-medium text-lu hover:text-lu-dark">
+              Sign up with LinkedIn
+            </Link>
           </p>
           <p>
             Forgot which email you used?{' '}
-            <a href="/auth/forgot-email" className="font-medium text-blue-600 hover:text-blue-800">
+            <Link href="/auth/forgot-email" className="font-medium text-lu hover:text-lu-dark">
               Find it with your file number
-            </a>
+            </Link>
           </p>
         </div>
-      <button
-        type="button"
-        onClick={() => signIn('keycloak', { callbackUrl: '/' })}
-        className="mt-6 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-      >
-        Sign in with Keycloak
-      </button>
+        <button
+          type="button"
+          onClick={() => signIn('keycloak', { callbackUrl: '/' })}
+          className={`${btnPrimary} mt-6`}
+        >
+          Sign in
+        </button>
+      </div>
     </main>
   );
 }

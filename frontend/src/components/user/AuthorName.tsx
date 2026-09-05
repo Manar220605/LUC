@@ -16,7 +16,7 @@ export default function AuthorName({ author }: Props) {
   }
 
   return (
-    <Link href={`/profile/${author.id}`} className="hover:text-blue-700">
+    <Link href={`/profile/${author.id}`} className="hover:text-lu">
       {name}
     </Link>
   );

@@ -128,15 +128,15 @@ export default function AdminCommunitiesPage() {
   if (status === 'loading' || loading) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-8">
-        <p className="text-gray-600">Loading communities…</p>
+        <p className="text-muted">Loading communities…</p>
       </main>
     );
   }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900">Manage communities</h1>
-      <p className="mt-1 text-sm text-gray-600">Admin only — create, edit, and delete communities.</p>
+      <h1 className="text-2xl font-semibold text-lu-deep">Manage communities</h1>
+      <p className="mt-1 text-sm text-muted">Admin only — create, edit, and delete communities.</p>
 
       {error && (
         <p className="mt-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -144,13 +144,13 @@ export default function AdminCommunitiesPage() {
         </p>
       )}
 
-      <section className="mt-8 rounded-lg border border-gray-200 bg-white p-4">
-        <h2 className="text-lg font-medium text-gray-900">Create community</h2>
+      <section className="mt-8 rounded-lg border border-lu/10 bg-white p-4">
+        <h2 className="text-lg font-medium text-lu-deep">Create community</h2>
         <form onSubmit={handleCreate} className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="text-sm">
             Slug
             <input
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+              className="mt-1 w-full rounded border border-lu/20 px-2 py-1"
               value={createSlug}
               onChange={(e) => setCreateSlug(e.target.value)}
               required
@@ -159,7 +159,7 @@ export default function AdminCommunitiesPage() {
           <label className="text-sm">
             Name
             <input
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+              className="mt-1 w-full rounded border border-lu/20 px-2 py-1"
               value={createName}
               onChange={(e) => setCreateName(e.target.value)}
               required
@@ -168,7 +168,7 @@ export default function AdminCommunitiesPage() {
           <label className="text-sm sm:col-span-2">
             Parent path
             <select
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+              className="mt-1 w-full rounded border border-lu/20 px-2 py-1"
               value={createParentPath}
               onChange={(e) => setCreateParentPath(e.target.value)}
             >
@@ -183,7 +183,7 @@ export default function AdminCommunitiesPage() {
           <label className="text-sm sm:col-span-2">
             Description
             <textarea
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+              className="mt-1 w-full rounded border border-lu/20 px-2 py-1"
               rows={2}
               value={createDescription}
               onChange={(e) => setCreateDescription(e.target.value)}
@@ -192,7 +192,7 @@ export default function AdminCommunitiesPage() {
           <div className="sm:col-span-2">
             <button
               type="submit"
-              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="rounded bg-lu px-4 py-2 text-sm font-medium text-white hover:bg-lu-dark"
             >
               Create
             </button>
@@ -201,13 +201,13 @@ export default function AdminCommunitiesPage() {
       </section>
 
       {editId != null && (
-        <section className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-          <h2 className="text-lg font-medium text-gray-900">Edit community</h2>
+        <section className="mt-6 rounded-lg border border-lu/20 bg-lu-soft p-4">
+          <h2 className="text-lg font-medium text-lu-deep">Edit community</h2>
           <form onSubmit={handleUpdate} className="mt-4 grid gap-3">
             <label className="text-sm">
               Name
               <input
-                className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+                className="mt-1 w-full rounded border border-lu/20 px-2 py-1"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 required
@@ -216,7 +216,7 @@ export default function AdminCommunitiesPage() {
             <label className="text-sm">
               Description
               <textarea
-                className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+                className="mt-1 w-full rounded border border-lu/20 px-2 py-1"
                 rows={2}
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
@@ -225,14 +225,14 @@ export default function AdminCommunitiesPage() {
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                className="rounded bg-lu px-4 py-2 text-sm font-medium text-white hover:bg-lu-dark"
               >
                 Save
               </button>
               <button
                 type="button"
                 onClick={() => setEditId(null)}
-                className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="rounded border border-lu/20 px-4 py-2 text-sm text-ink hover:bg-lu-soft"
               >
                 Cancel
               </button>
@@ -242,19 +242,19 @@ export default function AdminCommunitiesPage() {
       )}
 
       <section className="mt-8">
-        <h2 className="text-lg font-medium text-gray-900">All communities</h2>
-        <ul className="mt-3 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+        <h2 className="text-lg font-medium text-lu-deep">All communities</h2>
+        <ul className="mt-3 divide-y divide-lu-soft rounded-lg border border-lu/10 bg-white">
           {flat.map((node) => (
             <li key={node.id} className="flex items-center justify-between px-4 py-3">
               <div>
-                <p className="font-medium text-gray-900">{node.name}</p>
-                <p className="text-sm text-gray-500">{node.path}</p>
+                <p className="font-medium text-lu-deep">{node.name}</p>
+                <p className="text-sm text-muted">{node.path}</p>
               </div>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => startEdit(node)}
-                  className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+                  className="rounded border border-lu/20 px-3 py-1 text-sm hover:bg-lu-soft"
                 >
                   Edit
                 </button>

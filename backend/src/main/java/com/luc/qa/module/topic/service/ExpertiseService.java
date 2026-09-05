@@ -1,4 +1,4 @@
-package com.luc.qa.module.semantic.service;
+package com.luc.qa.module.topic.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;

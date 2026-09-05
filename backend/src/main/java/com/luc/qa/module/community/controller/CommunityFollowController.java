@@ -4,6 +4,7 @@ import com.luc.qa.module.community.dto.CommunityFollowResponseDTO;
 import com.luc.qa.module.community.dto.CreateFollowRequestDTO;
 import com.luc.qa.module.community.dto.FollowStatusDTO;
 import com.luc.qa.module.community.service.CommunityFollowService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -29,6 +30,10 @@ public class CommunityFollowController {
     private final CommunityFollowService communityFollowService;
 
     @PostMapping
+    @Operation(
+        summary = "Follow a community",
+        description = "Follows the community at the given path for the authenticated user. Requires JWT authentication."
+    )
     public FollowStatusDTO follow(
         @AuthenticationPrincipal Jwt jwt,
         @Valid @RequestBody CreateFollowRequestDTO request
@@ -37,6 +42,10 @@ public class CommunityFollowController {
     }
 
     @DeleteMapping
+    @Operation(
+        summary = "Unfollow a community",
+        description = "Unfollows the community at the given path for the authenticated user. Requires JWT authentication."
+    )
     public FollowStatusDTO unfollow(
         @AuthenticationPrincipal Jwt jwt,
         @RequestParam String communityPath
@@ -45,11 +54,19 @@ public class CommunityFollowController {
     }
 
     @GetMapping
+    @Operation(
+        summary = "List my followed communities",
+        description = "Returns communities followed by the authenticated user. Requires JWT authentication."
+    )
     public List<CommunityFollowResponseDTO> listMine(@AuthenticationPrincipal Jwt jwt) {
         return communityFollowService.listMine(jwt.getSubject());
     }
 
     @GetMapping("/status")
+    @Operation(
+        summary = "Get follow status",
+        description = "Returns whether the authenticated user follows the given community path. Requires JWT authentication."
+    )
     public FollowStatusDTO status(
         @AuthenticationPrincipal Jwt jwt,
         @RequestParam String communityPath

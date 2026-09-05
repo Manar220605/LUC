@@ -1,16 +1,22 @@
 file_number,email,first_name,last_name,enrollment_year,faculty,major
-2019004,rami.nassar@gmail.com,Rami,Nassar,2019,SCIENCES,Computer Science
-2019011,zeina.daher@gmail.com,Zeina,Daher,2019,SCIENCES,Computer Science
-2020007,hadi.chamoun@gmail.com,Hadi,Chamoun,2020,SCIENCES,Computer Science
-2020023,yara.salameh@gmail.com,Yara,Salameh,2020,SCIENCES,Computer Science
-2021005,jad.mansour@gmail.com,Jad,Mansour,2021,SCIENCES,Computer Science
-2021018,maya.aoun@gmail.com,Maya,Aoun,2021,SCIENCES,Computer Science
-2022009,bilal.rizk@gmail.com,Bilal,Rizk,2022,SCIENCES,Computer Science
-2022031,nour.saad@gmail.com,Nour,Saad,2022,SCIENCES,Computer Science
-2023015,omar.fares@gmail.com,Omar,Fares,2023,LITERATURE_AND_HUMAN_SCIENCES,English Language
-2023042,elie.kassab@gmail.com,Elie,Kassab,2023,SCIENCES,Computer Science
-2023056,lea.aboukhalil@gmail.com,Lea,Abou Khalil,2023,SCIENCES,Computer Science
-2024001,karim.haddad@gmail.com,Karim,Haddad,2024,SCIENCES,Computer Science
-2024002,sara.khalil@gmail.com,Sara,Khalil,2023,SCIENCES,Mathematics
-2024015,tarek.younes@gmail.com,Tarek,Younes,2024,SCIENCES,Computer Science
-2025003,rita.gebara@gmail.com,Rita,Gebara,2025,SCIENCES,Computer Science
+81247,lana.habib@gmail.com,Lana,Habib,2021,SCIENCES,Computer Science
+83491,marc.khoury@gmail.com,Marc,Khoury,2020,SCIENCES,Computer Science
+85102,sara.najem@gmail.com,Sara,Najem,2022,SCIENCES,Mathematics
+87633,rami.bassil@gmail.com,Rami,Bassil,2019,SCIENCES,Computer Science
+89015,naya.sleiman@gmail.com,Naya,Sleiman,2023,SCIENCES,Computer Science
+91567,jad.mansour@gmail.com,Jad,Mansour,2021,SCIENCES,Computer Science
+93842,zeina.farah@gmail.com,Zeina,Farah,2020,SCIENCES,Physics
+95201,karim.haddad@gmail.com,Karim,Haddad,2024,SCIENCES,Computer Science
+97488,maya.aoun@gmail.com,Maya,Aoun,2021,SCIENCES,Computer Science
+99120,elie.kassab@gmail.com,Elie,Kassab,2023,SCIENCES,Computer Science
+100334,nour.saad@gmail.com,Nour,Saad,2022,SCIENCES,Computer Science
+102879,rita.gebara@gmail.com,Rita,Gebara,2025,SCIENCES,Computer Science
+105441,omar.fares@gmail.com,Omar,Fares,2023,LITERATURE_AND_HUMAN_SCIENCES,English Language
+107012,lea.aboukhalil@gmail.com,Lea,Abou Khalil,2023,SCIENCES,Computer Science
+108765,hadi.chamoun@gmail.com,Hadi,Chamoun,2020,SCIENCES,Computer Science
+110238,yara.salameh@gmail.com,Yara,Salameh,2020,SCIENCES,Computer Science
+112904,bilal.rizk@gmail.com,Bilal,Rizk,2022,SCIENCES,Computer Science
+114556,tarek.younes@gmail.com,Tarek,Younes,2024,SCIENCES,Computer Science
+117089,rami.nassar@gmail.com,Rami,Nassar,2019,SCIENCES,Computer Science
+119642,zeina.daher@gmail.com,Zeina,Daher,2019,SCIENCES,Computer Science
+103521,karim.rmdn23@gmail.com,Karim,Ramadan,2023,SCIENCES,Computer Science

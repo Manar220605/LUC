@@ -229,6 +229,37 @@ export type QuestionSummaryDTO = {
   createdAt: string;
   viewerVote?: number | null;
   ownedByCurrentUser?: boolean;
+  courseCode?: string | null;
+  courseTitle?: string | null;
+};
+
+export type CourseSummaryDTO = {
+  code: string;
+  title: string;
+  yearLevel: number;
+  semester: number;
+  credits: number;
+};
+
+export type TopicSummaryDTO = {
+  slug: string;
+  name: string;
+};
+
+export type CourseExpertDTO = {
+  author: PublicAuthorDTO;
+  alumni: boolean;
+  currentCompany: string | null;
+  weight?: number;
+};
+
+export type CourseDetailDTO = {
+  course: CourseSummaryDTO;
+  description: string | null;
+  topics: TopicSummaryDTO[];
+  linkedQuestions: QuestionSummaryDTO[];
+  relatedQuestions?: QuestionSummaryDTO[];
+  people: CourseExpertDTO[];
 };
 
 export type QuestionResponseDTO = {
@@ -344,6 +375,7 @@ export type CreateQuestionRequestDTO = {
   title: string;
   body: string;
   anonymous?: boolean;
+  courseCode?: string;
 };
 
 export type AnswerTreeNodeDTO = {
@@ -378,6 +410,27 @@ export type AnswerResponseDTO = {
 export type CreateAnswerRequestDTO = {
   body: string;
   anonymous?: boolean;
+};
+
+export type AnnouncementResponseDTO = {
+  id: number;
+  title: string;
+  body: string;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateAnnouncementRequestDTO = {
+  title: string;
+  body: string;
+  published?: boolean;
+};
+
+export type UpdateAnnouncementRequestDTO = {
+  title: string;
+  body: string;
+  published?: boolean;
 };
 
 export type UpdateAnswerRequestDTO = {

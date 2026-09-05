@@ -1,51 +1,71 @@
 package com.luc.qa.module.user.service;
 
-import com.luc.qa.common.exception.ConflictException;
-import com.luc.qa.common.exception.UserNotFoundException;
-import com.luc.qa.common.keycloak.KeycloakAdminClient;
-import com.luc.qa.module.user.dto.OnboardingRequestDTO;
-import com.luc.qa.module.user.dto.UpdateProfileRequestDTO;
 import com.luc.qa.module.user.entity.User;
 import com.luc.qa.module.user.entity.UserRole;
 import com.luc.qa.module.user.repository.UserRepository;
-import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 @RequiredArgsConstructor
 public class UserProvisioningService {
 
     private final UserRepository userRepository;
+    private final PlatformTransactionManager transactionManager;
 
-    @Transactional
     public User provisionIfAbsent(Jwt jwt) {
         UUID keycloakId = UUID.fromString(jwt.getSubject());
         return userRepository.findByKeycloakId(keycloakId)
-            .orElseGet(() -> createFromJwt(jwt, keycloakId));
+            .orElseGet(() -> insertOrGet(jwt, keycloakId));
     }
 
-    private User createFromJwt(Jwt jwt, UUID keycloakId) {
+    /**
+     * First authenticated request after LinkedIn/Keycloak signup often fans out into several
+     * parallel API calls. Each hits this filter; without a race-safe insert the second insert
+     * fails on users_keycloak_id_key and the page shows Internal Server Error.
+     */
+    private User insertOrGet(Jwt jwt, UUID keycloakId) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        try {
+            User created = transactionTemplate.execute(status ->
+                userRepository.findByKeycloakId(keycloakId)
+                    .orElseGet(() -> userRepository.save(buildFromJwt(jwt, keycloakId)))
+            );
+            if (created == null) {
+                throw new IllegalStateException("User provisioning returned null");
+            }
+            return created;
+        } catch (DataIntegrityViolationException ex) {
+            return userRepository.findByKeycloakId(keycloakId).orElseThrow(() -> ex);
+        }
+    }
+
+    private User buildFromJwt(Jwt jwt, UUID keycloakId) {
         String email = jwt.getClaimAsString("email");
         if (email == null || email.isBlank()) {
             email = keycloakId + "@luc.local";
         }
 
-        User user = User.builder()
+        return User.builder()
             .keycloakId(keycloakId)
             .email(email)
             .displayName(resolveDisplayName(jwt))
             .role(UserRole.MEMBER)
             .banned(false)
             .build();
-
-        return userRepository.save(user);
     }
 
     private String resolveDisplayName(Jwt jwt) {
+        String name = jwt.getClaimAsString("name");
+        if (name != null && !name.isBlank()) {
+            return name.trim();
+        }
+
         String preferredUsername = jwt.getClaimAsString("preferred_username");
         if (preferredUsername != null && !preferredUsername.isBlank()) {
             return preferredUsername;

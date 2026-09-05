@@ -1,5 +1,6 @@
 package com.luc.qa.module.alumni.service;
 
+import com.luc.qa.common.email.EmailService;
 import com.luc.qa.common.exception.BadRequestException;
 import com.luc.qa.common.exception.UserNotFoundException;
 import com.luc.qa.common.exception.VerificationNotFoundException;
@@ -42,6 +43,7 @@ public class AdminAlumniServiceImpl implements AdminAlumniService {
     private final UserRepository userRepository;
     private final AlumniVerificationMapper verificationMapper;
     private final KeycloakAdminClient keycloakAdminClient;
+    private final EmailService emailService;
 
     @Override
     @Transactional(readOnly = true)
@@ -103,7 +105,9 @@ public class AdminAlumniServiceImpl implements AdminAlumniService {
             throw new BadRequestException("Failed to assign ALUMNI role in Keycloak: " + ex.getMessage());
         }
 
-        return verificationMapper.toResponse(verificationRepository.save(verification));
+        AlumniVerification saved = verificationRepository.save(verification);
+        sendApprovalEmail(user);
+        return verificationMapper.toResponse(saved);
     }
 
     @Override
@@ -114,13 +118,34 @@ public class AdminAlumniServiceImpl implements AdminAlumniService {
     ) {
         AlumniVerification verification = loadPendingVerification(id);
         User reviewer = findUser(reviewerKeycloakId);
+        User user = userRepository.findById(verification.getUser().getId())
+            .orElseThrow(() -> new UserNotFoundException(verification.getUser().getId()));
+        String reason = request.getRejectionReason().trim();
 
         verification.setStatus(VerificationStatus.REJECTED);
         verification.setReviewer(reviewer);
         verification.setReviewedAt(Instant.now());
-        verification.setRejectionReason(request.getRejectionReason().trim());
+        verification.setRejectionReason(reason);
 
-        return verificationMapper.toResponse(verificationRepository.save(verification));
+        AlumniVerification saved = verificationRepository.save(verification);
+        sendRejectionEmail(user, reason);
+        return verificationMapper.toResponse(saved);
+    }
+
+    private void sendApprovalEmail(User user) {
+        try {
+            emailService.sendAlumniVerificationApproved(user.getEmail(), user.getDisplayName());
+        } catch (RuntimeException ex) {
+            log.error("Approved alumni verification but could not email {}", user.getEmail(), ex);
+        }
+    }
+
+    private void sendRejectionEmail(User user, String reason) {
+        try {
+            emailService.sendAlumniVerificationRejected(user.getEmail(), user.getDisplayName(), reason);
+        } catch (RuntimeException ex) {
+            log.error("Rejected alumni verification but could not email {}", user.getEmail(), ex);
+        }
     }
 
     private AlumniVerification loadPendingVerification(Long id) {

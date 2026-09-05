@@ -67,14 +67,14 @@ export default function CommunityFollowButton({ communityPath }: Props) {
   }
 
   if (sessionStatus === 'loading' || loading) {
-    return <p className="text-sm text-gray-500">Loading…</p>;
+    return <p className="text-sm text-muted">Loading…</p>;
   }
 
   if (sessionStatus !== 'authenticated') {
     return (
       <Link
         href={`/auth/signin?callbackUrl=/c/${communityPath}`}
-        className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        className="rounded-md border border-lu/20 px-4 py-2 text-sm font-medium text-ink hover:bg-lu-soft"
       >
         Sign in to follow
       </Link>
@@ -89,14 +89,14 @@ export default function CommunityFollowButton({ communityPath }: Props) {
         disabled={busy}
         className={
           status?.following
-            ? 'rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50'
-            : 'rounded-md border border-blue-600 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50'
+            ? 'rounded-md border border-lu/20 px-4 py-2 text-sm font-medium text-ink hover:bg-lu-soft disabled:opacity-50'
+            : 'rounded-md border border-lu px-4 py-2 text-sm font-medium text-lu hover:bg-lu-soft disabled:opacity-50'
         }
       >
         {busy ? 'Saving…' : status?.following ? 'Following' : 'Follow'}
       </button>
       {status != null && (
-        <p className="mt-1 text-center text-xs text-gray-500">
+        <p className="mt-1 text-center text-xs text-muted">
           {status.followerCount} {status.followerCount === 1 ? 'follower' : 'followers'}
         </p>
       )}

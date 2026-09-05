@@ -1,6 +1,6 @@
 services:
   postgres:
-    build: ./postgres
+    image: postgres:16
     environment:
       POSTGRES_DB: luc
       POSTGRES_USER: luc
@@ -41,6 +41,7 @@ services:
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import-src/realm.json:ro
       - ./keycloak/entrypoint.sh:/opt/keycloak/entrypoint.sh:ro
+      - ./keycloak/themes/luc:/opt/keycloak/themes/luc:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -67,7 +68,6 @@ services:
       MAIL_SMTP_AUTH: ${KEYCLOAK_SMTP_AUTH:-false}
       MAIL_SMTP_STARTTLS: ${KEYCLOAK_SMTP_STARTTLS:-false}
       LUC_UPLOADS_DIR: /var/luc/uploads
-      LUC_EMBEDDER_URL: http://embedder:8088
     ports: ["8080:8080"]
     volumes:
       - backend_uploads:/var/luc/uploads
@@ -80,24 +80,6 @@ services:
         condition: service_started
       mailhog:
         condition: service_started
-      embedder:
-        condition: service_healthy
-
-  embedder:
-    build: ./embedder
-    ports: ["8088:8088"]
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8088/health')",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 30s
 
   mailhog:
     image: mailhog/mailhog:v1.0.1

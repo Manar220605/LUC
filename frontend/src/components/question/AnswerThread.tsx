@@ -264,17 +264,17 @@ function AnswerComposer({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-3 space-y-2 rounded-md border border-gray-200 bg-gray-50 p-3">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+    <form onSubmit={handleSubmit} className="mt-3 space-y-2 rounded-md border border-lu/10 bg-lu-mist p-3">
+      <label className="block text-sm font-medium text-ink">{label}</label>
       <textarea
         value={body}
         onChange={(event) => setBody(event.target.value)}
         rows={3}
         required
-        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+        className="w-full rounded-md border border-lu/20 px-3 py-2 text-sm"
         placeholder="Write your answer…"
       />
-      <label className="flex items-center gap-2 text-sm text-gray-600">
+      <label className="flex items-center gap-2 text-sm text-muted">
         <input
           type="checkbox"
           checked={anonymous}
@@ -287,7 +287,7 @@ function AnswerComposer({
         <button
           type="submit"
           disabled={submitting || !body.trim()}
-          className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="rounded-md bg-lu px-3 py-1.5 text-sm font-medium text-white hover:bg-lu-dark disabled:opacity-50"
         >
           {submitting ? 'Submitting…' : 'Submit'}
         </button>
@@ -295,7 +295,7 @@ function AnswerComposer({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+            className="rounded-md border border-lu/20 px-3 py-1.5 text-sm text-ink hover:bg-lu-soft"
           >
             Cancel
           </button>
@@ -409,14 +409,14 @@ function AnswerNode({
 
   return (
     <div
-      className="border-l border-gray-200 pl-4"
+      className="border-l border-lu/10 pl-4"
       style={{ marginLeft: depth > 0 ? '0.75rem' : undefined }}
     >
       <article
         className={`rounded-lg border bg-white p-4 ${
           answer.accepted
             ? 'border-green-500 bg-green-50 ring-1 ring-green-200'
-            : 'border-gray-200'
+            : 'border-lu/10'
         }`}
       >
         <div className="flex items-start gap-3">
@@ -437,8 +437,8 @@ function AnswerNode({
                 Accepted answer
               </p>
             )}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
-              <span className="flex flex-wrap items-center gap-2 font-medium text-gray-700">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+              <span className="flex flex-wrap items-center gap-2 font-medium text-ink">
                 <AuthorName author={answer.author} />
                 <AuthorBadge author={answer.author} />
               </span>
@@ -468,7 +468,7 @@ function AnswerNode({
             <button
               type="button"
               onClick={handleReplyClick}
-              className="font-medium text-blue-600 hover:text-blue-800"
+              className="font-medium text-lu hover:text-lu-dark"
             >
               Reply
             </button>
@@ -490,7 +490,7 @@ function AnswerNode({
               <button
                 type="button"
                 onClick={() => setEditOpen(true)}
-                className="font-medium text-gray-600 hover:text-gray-900"
+                className="font-medium text-muted hover:text-lu-deep"
               >
                 Edit
               </button>
@@ -526,7 +526,7 @@ function AnswerNode({
             <button
               type="button"
               onClick={() => setCollapsed((value) => !value)}
-              className="font-medium text-gray-600 hover:text-gray-900"
+              className="font-medium text-muted hover:text-lu-deep"
             >
               {collapsed
                 ? `Show ${answer.replies.length} ${answer.replies.length === 1 ? 'reply' : 'replies'}`
@@ -789,13 +789,13 @@ export default function AnswerThread({
   return (
     <section className="mt-10">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-lu-deep">
           Answers ({answerCount})
         </h2>
         <button
           type="button"
           onClick={handleTopLevelOpen}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-md bg-lu px-4 py-2 text-sm font-medium text-white hover:bg-lu-dark"
         >
           {topLevelOpen ? 'Cancel' : 'Add answer'}
         </button>
@@ -821,7 +821,7 @@ export default function AnswerThread({
 
       <div className="mt-6 space-y-4">
         {answers.length === 0 ? (
-          <p className="text-sm text-gray-500">No answers yet. Be the first to respond.</p>
+          <p className="text-sm text-muted">No answers yet. Be the first to respond.</p>
         ) : (
           answers.map((answer) => (
             <AnswerNode

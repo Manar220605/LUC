@@ -98,15 +98,15 @@ export default function AdminVerificationsPage() {
   if (status === 'loading' || loading) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-8">
-        <p className="text-gray-600">Loading verification queue…</p>
+        <p className="text-muted">Loading verification queue…</p>
       </main>
     );
   }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900">Alumni verification queue</h1>
-      <p className="mt-1 text-sm text-gray-600">Review pending requests and assign the Alumni role.</p>
+      <h1 className="text-2xl font-semibold text-lu-deep">Alumni verification queue</h1>
+      <p className="mt-1 text-sm text-muted">Review pending requests and assign the Alumni role.</p>
 
       {error && (
         <p className="mt-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -115,10 +115,10 @@ export default function AdminVerificationsPage() {
       )}
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <label className="text-sm text-gray-700">
+        <label className="text-sm text-ink">
           Status
           <select
-            className="ml-2 rounded border border-gray-300 px-2 py-1"
+            className="ml-2 rounded border border-lu/20 px-2 py-1"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as '' | VerificationStatus)}
           >
@@ -133,12 +133,12 @@ export default function AdminVerificationsPage() {
 
       {rejectId != null && (
         <section className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
-          <h2 className="text-lg font-medium text-gray-900">Reject request #{rejectId}</h2>
+          <h2 className="text-lg font-medium text-lu-deep">Reject request #{rejectId}</h2>
           <form onSubmit={handleReject} className="mt-3 grid gap-3">
             <label className="text-sm">
               Rejection reason
               <textarea
-                className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+                className="mt-1 w-full rounded border border-lu/20 px-2 py-1"
                 rows={3}
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
@@ -159,7 +159,7 @@ export default function AdminVerificationsPage() {
                   setRejectId(null);
                   setRejectionReason('');
                 }}
-                className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="rounded border border-lu/20 px-4 py-2 text-sm text-ink hover:bg-lu-soft"
               >
                 Cancel
               </button>
@@ -170,23 +170,23 @@ export default function AdminVerificationsPage() {
 
       <section className="mt-8">
         {items.length === 0 ? (
-          <p className="text-sm text-gray-500">No verification requests found.</p>
+          <p className="text-sm text-muted">No verification requests found.</p>
         ) : (
-          <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+          <ul className="divide-y divide-lu-soft rounded-lg border border-lu/10 bg-white">
             {items.map((item) => (
               <li key={item.id} className="px-4 py-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-lu-deep">
                       {item.userDisplayName}{' '}
-                      <span className="font-normal text-gray-500">({item.userEmail})</span>
+                      <span className="font-normal text-muted">({item.userEmail})</span>
                     </p>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-muted">
                       {item.claimedGradYear} · {facultyLabel(item.claimedFaculty)} ·{' '}
                       {degreeLabel(item.claimedDegree)} · {item.claimedMajor}
                     </p>
                     {(item.claimedPosition || item.claimedCompany) && (
-                      <p className="mt-1 text-sm text-gray-600">
+                      <p className="mt-1 text-sm text-muted">
                         {[item.claimedPosition, item.claimedCompany].filter(Boolean).join(' at ')}
                       </p>
                     )}
@@ -195,12 +195,12 @@ export default function AdminVerificationsPage() {
                         href={item.linkedinUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-medium text-blue-600 hover:text-blue-800"
+                        className="font-medium text-lu hover:text-lu-dark"
                       >
                         Open LinkedIn profile
                       </a>
                     </p>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-muted">
                       Submitted {new Date(item.submittedAt).toLocaleString()} · Status:{' '}
                       {item.status}
                     </p>

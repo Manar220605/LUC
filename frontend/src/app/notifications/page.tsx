@@ -87,7 +87,7 @@ export default function NotificationsPage() {
   if (status === 'loading' || status === 'unauthenticated') {
     return (
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-muted">Loading…</p>
       </main>
     );
   }
@@ -96,8 +96,8 @@ export default function NotificationsPage() {
     <main className="mx-auto max-w-3xl px-4 py-8">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="text-3xl font-bold text-lu-deep">Notifications</h1>
+          <p className="mt-1 text-sm text-muted">
             Unread items stay highlighted. Opening one marks it read and keeps it here.
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function NotificationsPage() {
           <button
             type="button"
             onClick={handleMarkAllRead}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-md border border-lu/20 px-3 py-1.5 text-sm font-medium text-ink hover:bg-lu-soft"
           >
             Mark all read
           </button>
@@ -116,11 +116,11 @@ export default function NotificationsPage() {
 
       <section className="mt-6">
         {loading ? (
-          <p className="text-sm text-gray-500">Loading notifications…</p>
+          <p className="text-sm text-muted">Loading notifications…</p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-gray-500">No notifications yet.</p>
+          <p className="text-sm text-muted">No notifications yet.</p>
         ) : (
-          <ul className="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white">
+          <ul className="divide-y divide-lu-soft overflow-hidden rounded-lg border border-lu/10 bg-white">
             {items.map((notification) => (
               <li key={notification.id}>
                 <NotificationRow
@@ -139,18 +139,18 @@ export default function NotificationsPage() {
             type="button"
             disabled={page <= 0 || loading}
             onClick={() => loadPage(page - 1)}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-md border border-lu/20 px-3 py-1.5 text-sm disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-muted">
             Page {page + 1} of {totalPages}
           </span>
           <button
             type="button"
             disabled={page + 1 >= totalPages || loading}
             onClick={() => loadPage(page + 1)}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50"
+            className="rounded-md border border-lu/20 px-3 py-1.5 text-sm disabled:opacity-50"
           >
             Next
           </button>

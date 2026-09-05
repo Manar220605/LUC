@@ -29,7 +29,7 @@ export default function Avatar({ name, avatarUrl, previewSrc, size = 'lg' }: Pro
       <img
         src={src}
         alt=""
-        className={`${dimension} rounded-full object-cover ring-1 ring-gray-200`}
+        className={`${dimension} rounded-full object-cover ring-2 ring-lu/15`}
       />
     );
   }
@@ -37,7 +37,7 @@ export default function Avatar({ name, avatarUrl, previewSrc, size = 'lg' }: Pro
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex ${dimension} items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-800`}
+      className={`inline-flex ${dimension} items-center justify-center rounded-full bg-lu-soft font-semibold text-lu-dark`}
     >
       {initials(name)}
     </span>

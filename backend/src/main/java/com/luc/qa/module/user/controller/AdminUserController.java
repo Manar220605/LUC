@@ -7,6 +7,7 @@ import com.luc.qa.module.user.dto.BanUserRequestDTO;
 import com.luc.qa.module.user.dto.UpdateUserRoleRequestDTO;
 import com.luc.qa.module.user.mapper.UserMapper;
 import com.luc.qa.module.user.service.AdminUserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -33,6 +34,10 @@ public class AdminUserController {
     private final UserMapper userMapper;
 
     @GetMapping
+    @Operation(
+        summary = "List users (admin)",
+        description = "Returns a paginated, filterable list of users. Requires ADMIN role."
+    )
     public PageResponseDTO<AdminUserResponseDTO> list(@ModelAttribute AdminUserFilterDTO filter) {
         var page = adminUserService.listUsers(filter);
         List<AdminUserResponseDTO> content = page.getContent().stream()
@@ -48,6 +53,10 @@ public class AdminUserController {
     }
 
     @PutMapping("/{id}/ban")
+    @Operation(
+        summary = "Ban user (admin)",
+        description = "Bans a user with the given reason. Requires ADMIN role."
+    )
     public AdminUserResponseDTO ban(
         @PathVariable Long id,
         @Valid @RequestBody BanUserRequestDTO request
@@ -57,11 +66,19 @@ public class AdminUserController {
 
     @PutMapping("/{id}/unban")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+        summary = "Unban user (admin)",
+        description = "Removes a ban from a user. Requires ADMIN role."
+    )
     public void unban(@PathVariable Long id) {
         adminUserService.unbanUser(id);
     }
 
     @PutMapping("/{id}/role")
+    @Operation(
+        summary = "Update user role (admin)",
+        description = "Changes a user's role. Requires ADMIN role."
+    )
     public AdminUserResponseDTO updateRole(
         @PathVariable Long id,
         @Valid @RequestBody UpdateUserRoleRequestDTO request

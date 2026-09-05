@@ -11,9 +11,11 @@ import type {
   CommunityTreeNodeDTO,
   CreateQuestionRequestDTO,
 } from '@/lib/types';
+import { alertError, btnPrimary, input, label } from '@/lib/ui';
 
 type Props = {
   initialCommunityPath?: string;
+  initialCourseCode?: string;
 };
 
 function pathExists(nodes: CommunityTreeNodeDTO[], path: string): boolean {
@@ -43,10 +45,11 @@ function communityName(nodes: CommunityTreeNodeDTO[], path: string): string | nu
   return null;
 }
 
-export default function NewQuestionForm({ initialCommunityPath }: Props) {
+export default function NewQuestionForm({ initialCommunityPath, initialCourseCode }: Props) {
   const router = useRouter();
   const [tree, setTree] = useState<CommunityTreeNodeDTO[]>([]);
   const [communityPath, setCommunityPath] = useState(initialCommunityPath?.trim() || 'cs');
+  const [courseCode] = useState(initialCourseCode?.trim() || '');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [anonymous, setAnonymous] = useState(false);
@@ -89,6 +92,7 @@ export default function NewQuestionForm({ initialCommunityPath }: Props) {
         title: title.trim(),
         body: body.trim(),
         anonymous,
+        ...(courseCode ? { courseCode } : {}),
       };
 
       const created = await clientApiRequest<{ id: number }>('/api/questions', {
@@ -106,29 +110,34 @@ export default function NewQuestionForm({ initialCommunityPath }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error}
-        </p>
-      )}
+      {error && <p className={alertError}>{error}</p>}
 
       <div>
-        <label htmlFor="community" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="community" className={label}>
           Community
         </label>
         {communityLocked ? (
-          <p className="mt-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          <p className="mt-1 rounded-lg border border-lu/10 bg-lu-mist px-3 py-2 text-sm text-ink">
             {lockedName ? `${lockedName} (c/${lockedPath})` : `c/${lockedPath}`}
           </p>
         ) : tree.length > 0 ? (
           <CommunityPicker nodes={tree} value={communityPath} onChange={setCommunityPath} />
         ) : (
-          <p className="mt-1 text-sm text-gray-500">Loading communities…</p>
+          <p className="mt-1 text-sm text-muted">Loading communities…</p>
         )}
       </div>
 
+      {courseCode && (
+        <div>
+          <p className={label}>Course</p>
+          <p className="mt-1 rounded-lg border border-lu/10 bg-lu-mist px-3 py-2 text-sm font-mono text-lu">
+            {courseCode}
+          </p>
+        </div>
+      )}
+
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="title" className={label}>
           Title
         </label>
         <input
@@ -138,12 +147,12 @@ export default function NewQuestionForm({ initialCommunityPath }: Props) {
           onChange={(event) => setTitle(event.target.value)}
           maxLength={300}
           required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className={input}
         />
       </div>
 
       <div>
-        <label htmlFor="body" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="body" className={label}>
           Body
         </label>
         <textarea
@@ -152,11 +161,11 @@ export default function NewQuestionForm({ initialCommunityPath }: Props) {
           onChange={(event) => setBody(event.target.value)}
           required
           rows={8}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className={input}
         />
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-gray-700">
+      <label className="flex items-center gap-2 text-sm text-ink">
         <input
           type="checkbox"
           checked={anonymous}
@@ -165,11 +174,7 @@ export default function NewQuestionForm({ initialCommunityPath }: Props) {
         Post anonymously
       </label>
 
-      <button
-        type="submit"
-        disabled={submitting || tree.length === 0}
-        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-      >
+      <button type="submit" disabled={submitting || tree.length === 0} className={btnPrimary}>
         {submitting ? 'Posting…' : 'Post question'}
       </button>
     </form>

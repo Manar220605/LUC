@@ -9,8 +9,8 @@ export default function CommunityBreadcrumb({ path }: Props) {
   let cumulative = '';
 
   return (
-    <nav className="mb-4 text-sm text-gray-600">
-      <Link href="/" className="hover:text-gray-900">
+    <nav className="mb-4 text-sm text-muted">
+      <Link href="/" className="hover:text-lu-deep">
         Home
       </Link>
       {segments.map((segment) => {
@@ -19,7 +19,7 @@ export default function CommunityBreadcrumb({ path }: Props) {
         return (
           <span key={cumulative}>
             {' / '}
-            <Link href={href} className="hover:text-gray-900">
+            <Link href={href} className="hover:text-lu-deep">
               {segment.replace(/_/g, ' ')}
             </Link>
           </span>

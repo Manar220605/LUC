@@ -8,6 +8,7 @@ type Props = {
   action?: 'global' | 'community';
   placeholder?: string;
   className?: string;
+  variant?: 'default' | 'onBrand';
 };
 
 export default function QuestionSearchBox({
@@ -15,9 +16,11 @@ export default function QuestionSearchBox({
   action = 'global',
   placeholder = 'Search questions…',
   className = '',
+  variant = 'default',
 }: Props) {
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
+  const onBrand = variant === 'onBrand';
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -55,11 +58,19 @@ export default function QuestionSearchBox({
         onChange={(event) => setQuery(event.target.value)}
         placeholder={placeholder}
         aria-label="Search questions"
-        className="min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className={
+          onBrand
+            ? 'min-w-0 flex-1 rounded-lg border-0 bg-white px-3 py-1.5 text-sm text-ink placeholder:text-muted/70 outline-none ring-0 focus:ring-2 focus:ring-white/70'
+            : 'min-w-0 flex-1 rounded-lg border border-lu/20 bg-white px-3 py-1.5 text-sm text-ink placeholder:text-muted/60 outline-none focus:border-lu focus:ring-2 focus:ring-lu/20'
+        }
       />
       <button
         type="submit"
-        className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+        className={
+          onBrand
+            ? 'rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-lu hover:bg-lu-soft'
+            : 'rounded-lg bg-lu px-3 py-1.5 text-sm font-semibold text-white hover:bg-lu-dark'
+        }
       >
         Search
       </button>
@@ -67,7 +78,7 @@ export default function QuestionSearchBox({
         <button
           type="button"
           onClick={handleClear}
-          className="rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+          className="rounded-lg border border-lu/20 px-2 py-1.5 text-sm text-lu-dark hover:bg-lu-soft"
         >
           Clear
         </button>

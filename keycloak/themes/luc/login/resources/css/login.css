@@ -1,0 +1,234 @@
+/* Lebanese University Connect — Keycloak login (matches frontend) */
+
+:root {
+  --luc-blue: #3262a4;
+  --luc-blue-dark: #244a7c;
+  --luc-blue-deep: #163256;
+  --luc-soft: #e8f0f8;
+  --luc-mist: #f4f7fb;
+  --luc-ink: #152033;
+  --luc-muted: #5b6b80;
+
+  --pf-v5-global--primary-color--100: #3262a4;
+  --pf-v5-global--primary-color--200: #244a7c;
+  --pf-v5-global--link--Color: #3262a4;
+  --pf-v5-global--link--Color--hover: #244a7c;
+  --pf-v5-global--active-color--100: #3262a4;
+  --pf-v5-c-button--m-primary--BackgroundColor: #3262a4;
+  --pf-v5-c-button--m-primary--BackgroundColor--hover: #244a7c;
+  --pf-v5-c-button--m-primary--after--BorderColor: #3262a4;
+  --pf-v5-c-button--m-primary--hover--after--BorderColor: #244a7c;
+}
+
+html,
+body,
+#keycloak-bg {
+  min-height: 100%;
+  background: var(--luc-mist) !important;
+  color: var(--luc-ink);
+  font-family: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+}
+
+.pf-v5-c-login {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, var(--luc-blue) 0 38%, transparent 38%),
+    var(--luc-mist) !important;
+  padding: 2rem 1rem 3rem !important;
+}
+
+.pf-v5-c-login__container {
+  max-width: 26rem;
+}
+
+/* Brand header */
+.pf-v5-c-login__header {
+  text-align: center;
+  margin-bottom: 1.25rem !important;
+}
+
+.pf-v5-c-brand {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fff !important;
+  font-size: 1.2rem !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.pf-v5-c-brand::before {
+  content: "";
+  display: block;
+  width: 4.75rem;
+  height: 4.75rem;
+  background: #fff url("../img/lu-logo.jpg") center / contain no-repeat;
+  border-radius: 0.85rem;
+  box-shadow: 0 12px 32px rgba(22, 50, 86, 0.28);
+}
+
+/* Card */
+.pf-v5-c-login__main {
+  background: #fff !important;
+  border: 1px solid rgba(50, 98, 164, 0.12) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 14px 40px rgba(22, 50, 86, 0.14) !important;
+  overflow: hidden;
+}
+
+.pf-v5-c-login__main-header {
+  background: #fff !important;
+  border-bottom: 1px solid var(--luc-soft) !important;
+  padding: 1.25rem 1.5rem 1rem !important;
+}
+
+#kc-page-title,
+.pf-v5-c-title {
+  color: var(--luc-blue-deep) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em;
+}
+
+.pf-v5-c-login__main-body {
+  padding: 1.25rem 1.5rem 1.5rem !important;
+}
+
+/* Form controls */
+.pf-v5-c-form__label-text {
+  color: var(--luc-blue-deep) !important;
+  font-weight: 600 !important;
+}
+
+.pf-v5-c-form-control,
+.pf-v5-c-form-control > input,
+#username,
+#password {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: var(--luc-ink) !important;
+  border-radius: 0.55rem !important;
+  --pf-v5-c-form-control--BackgroundColor: #ffffff !important;
+  --pf-v5-c-form-control--Color: var(--luc-ink) !important;
+  --pf-v5-c-form-control--BorderColor: rgba(50, 98, 164, 0.25) !important;
+}
+
+.pf-v5-c-form-control:focus-within,
+.pf-v5-c-form-control:hover,
+#username:focus,
+#password:focus {
+  --pf-v5-c-form-control--BorderColor: var(--luc-blue) !important;
+  background-color: #ffffff !important;
+}
+
+.pf-v5-c-form-control > input::placeholder,
+#username::placeholder,
+#password::placeholder {
+  color: var(--luc-muted) !important;
+  opacity: 1;
+}
+
+.pf-v5-c-input-group,
+.pf-v5-c-input-group__item {
+  background: transparent !important;
+}
+
+/* Reveal / hide password button */
+.pf-v5-c-button.pf-m-control,
+button[data-password-toggle] {
+  background-color: #ffffff !important;
+  color: var(--luc-blue-deep) !important;
+  border-radius: 0.55rem !important;
+  border-color: rgba(50, 98, 164, 0.25) !important;
+  --pf-v5-c-button--m-control--BackgroundColor: #ffffff !important;
+  --pf-v5-c-button--m-control--after--BorderColor: rgba(50, 98, 164, 0.25) !important;
+  --pf-v5-c-button--m-control--Color: var(--luc-blue-deep) !important;
+}
+
+.pf-v5-c-button.pf-m-control:hover,
+button[data-password-toggle]:hover {
+  background-color: #ffffff !important;
+  color: var(--luc-blue) !important;
+}
+
+.pf-v5-c-button.pf-m-control svg,
+button[data-password-toggle] svg {
+  color: inherit !important;
+  fill: currentColor !important;
+}
+
+/* Primary CTA */
+.pf-v5-c-button.pf-m-primary,
+#kc-login {
+  background-color: var(--luc-blue) !important;
+  border-radius: 0.55rem !important;
+  font-weight: 650 !important;
+}
+
+.pf-v5-c-button.pf-m-primary:hover,
+#kc-login:hover {
+  background-color: var(--luc-blue-dark) !important;
+}
+
+/* Links / footer */
+.pf-v5-c-login__main-footer,
+.pf-v5-c-login__main-footer-band {
+  background: var(--luc-mist) !important;
+  border-top: 1px solid var(--luc-soft) !important;
+}
+
+a,
+.pf-v5-c-login__main-footer a,
+#kc-form-options a {
+  color: var(--luc-blue) !important;
+}
+
+a:hover {
+  color: var(--luc-blue-dark) !important;
+}
+
+/* Social providers */
+#social-providers .pf-v5-c-button,
+.pf-v5-c-login__main-footer-links .pf-v5-c-button {
+  border-radius: 0.55rem !important;
+  border-color: rgba(50, 98, 164, 0.25) !important;
+  color: var(--luc-blue-deep) !important;
+}
+
+#social-providers .pf-v5-c-button:hover {
+  background: var(--luc-soft) !important;
+}
+
+/* Alerts */
+.pf-v5-c-alert {
+  border-radius: 0.75rem !important;
+}
+
+/* Keep light inputs even if OS prefers dark mode */
+html.pf-v5-theme-dark,
+html.pf-v5-theme-dark body,
+html.pf-v5-theme-dark #keycloak-bg {
+  color-scheme: light;
+  background: var(--luc-mist) !important;
+  color: var(--luc-ink) !important;
+}
+
+html.pf-v5-theme-dark .pf-v5-c-login__main,
+html.pf-v5-theme-dark .pf-v5-c-login__main-header,
+html.pf-v5-theme-dark .pf-v5-c-login__main-body {
+  background: #ffffff !important;
+  color: var(--luc-ink) !important;
+}
+
+html.pf-v5-theme-dark .pf-v5-c-form-control,
+html.pf-v5-theme-dark .pf-v5-c-form-control > input,
+html.pf-v5-theme-dark #username,
+html.pf-v5-theme-dark #password,
+html.pf-v5-theme-dark .pf-v5-c-button.pf-m-control,
+html.pf-v5-theme-dark button[data-password-toggle] {
+  background-color: #ffffff !important;
+  color: var(--luc-ink) !important;
+  --pf-v5-c-form-control--BackgroundColor: #ffffff !important;
+  --pf-v5-c-button--m-control--BackgroundColor: #ffffff !important;
+}

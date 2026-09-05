@@ -95,16 +95,16 @@ export default function ProfileSettings({ initialProfile }: Props) {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900">Your profile</h1>
-      <p className="mt-2 text-sm text-gray-600">
-        <Link href={`/profile/${profile.id}`} className="font-medium text-blue-700 hover:text-blue-800">
+      <h1 className="text-2xl font-semibold text-lu-deep">Your profile</h1>
+      <p className="mt-2 text-sm text-muted">
+        <Link href={`/profile/${profile.id}`} className="font-medium text-lu hover:text-lu-dark">
           View public profile
         </Link>
       </p>
 
-      <section className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-medium text-gray-900">Photo</h2>
-        <p className="mt-1 text-sm text-gray-600">JPEG, PNG, or WebP. Maximum 2 MB.</p>
+      <section className="mt-6 rounded-lg border border-lu/10 bg-white p-6">
+        <h2 className="text-lg font-medium text-lu-deep">Photo</h2>
+        <p className="mt-1 text-sm text-muted">JPEG, PNG, or WebP. Maximum 2 MB.</p>
         <div className="mt-4 flex flex-wrap items-center gap-4">
           <Avatar
             name={displayName || profile.displayName}
@@ -112,7 +112,7 @@ export default function ProfileSettings({ initialProfile }: Props) {
             previewSrc={previewSrc}
           />
           <div className="flex flex-wrap gap-2">
-            <label className="cursor-pointer rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+            <label className="cursor-pointer rounded-md bg-lu px-3 py-1.5 text-sm font-medium text-white hover:bg-lu-dark">
               {uploading ? 'Uploading…' : 'Upload photo'}
               <input
                 ref={fileInputRef}
@@ -128,7 +128,7 @@ export default function ProfileSettings({ initialProfile }: Props) {
                 type="button"
                 onClick={handleRemovePhoto}
                 disabled={uploading || removing}
-                className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                className="rounded-md border border-lu/20 px-3 py-1.5 text-sm font-medium text-ink hover:bg-lu-soft disabled:opacity-50"
               >
                 {removing ? 'Removing…' : 'Remove photo'}
               </button>
@@ -137,22 +137,22 @@ export default function ProfileSettings({ initialProfile }: Props) {
         </div>
       </section>
 
-      <form onSubmit={handleSave} className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-medium text-gray-900">Details</h2>
-        <label className="mt-4 block text-sm font-medium text-gray-700">
+      <form onSubmit={handleSave} className="mt-6 rounded-lg border border-lu/10 bg-white p-6">
+        <h2 className="text-lg font-medium text-lu-deep">Details</h2>
+        <label className="mt-4 block text-sm font-medium text-ink">
           Display name
           <input
-            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900"
+            className="mt-1 w-full rounded-md border border-lu/20 px-3 py-2 text-sm text-lu-deep"
             value={displayName}
             maxLength={100}
             onChange={(event) => setDisplayName(event.target.value)}
             required
           />
         </label>
-        <label className="mt-4 block text-sm font-medium text-gray-700">
+        <label className="mt-4 block text-sm font-medium text-ink">
           Bio
           <textarea
-            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900"
+            className="mt-1 w-full rounded-md border border-lu/20 px-3 py-2 text-sm text-lu-deep"
             rows={5}
             maxLength={5000}
             value={bio}
@@ -160,7 +160,7 @@ export default function ProfileSettings({ initialProfile }: Props) {
             placeholder="A short introduction. This appears on your public profile."
           />
         </label>
-        <p className="mt-1 text-xs text-gray-500">{bio.length}/5000</p>
+        <p className="mt-1 text-xs text-muted">{bio.length}/5000</p>
 
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
         {saved && <p className="mt-4 text-sm text-green-700">Saved.</p>}
@@ -168,24 +168,24 @@ export default function ProfileSettings({ initialProfile }: Props) {
         <button
           type="submit"
           disabled={saving}
-          className="mt-4 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="mt-4 rounded-md bg-lu px-4 py-2 text-sm font-medium text-white hover:bg-lu-dark disabled:opacity-50"
         >
           {saving ? 'Saving…' : 'Save'}
         </button>
       </form>
 
-      <dl className="mt-6 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+      <dl className="mt-6 divide-y divide-lu-soft rounded-lg border border-lu/10 bg-white">
         <div className="grid grid-cols-3 gap-4 px-4 py-3">
-          <dt className="text-sm font-medium text-gray-500">Email</dt>
-          <dd className="col-span-2 text-sm text-gray-900">{profile.email}</dd>
+          <dt className="text-sm font-medium text-muted">Email</dt>
+          <dd className="col-span-2 text-sm text-lu-deep">{profile.email}</dd>
         </div>
         <div className="grid grid-cols-3 gap-4 px-4 py-3">
-          <dt className="text-sm font-medium text-gray-500">Role</dt>
-          <dd className="col-span-2 text-sm text-gray-900">{profile.role}</dd>
+          <dt className="text-sm font-medium text-muted">Role</dt>
+          <dd className="col-span-2 text-sm text-lu-deep">{profile.role}</dd>
         </div>
         <div className="grid grid-cols-3 gap-4 px-4 py-3">
-          <dt className="text-sm font-medium text-gray-500">Member since</dt>
-          <dd className="col-span-2 text-sm text-gray-900">
+          <dt className="text-sm font-medium text-muted">Member since</dt>
+          <dd className="col-span-2 text-sm text-lu-deep">
             {new Date(profile.createdAt).toLocaleDateString()}
           </dd>
         </div>

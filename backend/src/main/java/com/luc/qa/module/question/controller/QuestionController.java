@@ -7,6 +7,7 @@ import com.luc.qa.module.question.entity.Question;
 import com.luc.qa.module.question.mapper.QuestionMapper;
 import com.luc.qa.module.question.service.QuestionService;
 import com.luc.qa.module.vote.service.VoteService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -42,6 +43,10 @@ public class QuestionController {
     private final VoteService voteService;
 
     @GetMapping("/{id}")
+    @Operation(
+        summary = "Get question by ID",
+        description = "Fetches a question, increments its view count, and enriches vote state when a JWT is present."
+    )
     public QuestionResponseDTO get(@PathVariable Long id) {
         questionService.incrementView(id);
         Question question = questionService.findById(id);
@@ -52,6 +57,10 @@ public class QuestionController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Create question",
+        description = "Creates a new question. Requires JWT authentication."
+    )
     public ResponseEntity<QuestionResponseDTO> create(
         @Valid @RequestBody CreateQuestionRequestDTO request,
         @AuthenticationPrincipal Jwt jwt
@@ -64,6 +73,10 @@ public class QuestionController {
 
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Update question",
+        description = "Updates an existing question. Requires JWT authentication; caller must own the question (or have edit rights)."
+    )
     public QuestionResponseDTO update(
         @PathVariable Long id,
         @Valid @RequestBody UpdateQuestionRequestDTO request,
@@ -77,12 +90,20 @@ public class QuestionController {
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+        summary = "Soft-delete question",
+        description = "Soft-deletes a question. Requires JWT authentication; caller must own the question."
+    )
     public void delete(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
         questionService.softDelete(id, jwt.getSubject());
     }
 
     @PutMapping("/{questionId}/accepted-answer/{answerId}")
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Accept an answer",
+        description = "Marks an answer as accepted for the question. Requires JWT authentication; typically the question author."
+    )
     public QuestionResponseDTO acceptAnswer(
         @PathVariable Long questionId,
         @PathVariable Long answerId,
@@ -97,6 +118,10 @@ public class QuestionController {
 
     @DeleteMapping("/{questionId}/accepted-answer")
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+        summary = "Unaccept answer",
+        description = "Clears the accepted answer on a question. Requires JWT authentication; typically the question author."
+    )
     public QuestionResponseDTO unacceptAnswer(
         @PathVariable Long questionId,
         @AuthenticationPrincipal Jwt jwt

@@ -2,6 +2,7 @@ package com.luc.qa.module.question.repository;
 
 import com.luc.qa.module.question.entity.Question;
 import com.luc.qa.module.question.entity.QuestionStatus;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
