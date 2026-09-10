@@ -65,21 +65,9 @@ export default function AlumniSignupPage() {
           </Link>
         </p>
 
-        <div className="mt-8 rounded-xl border border-lu/10 bg-lu-mist p-4 text-sm text-muted">
-          <p className="font-medium text-lu-deep">Dev note</p>
-          <p className="mt-1">
-            LinkedIn needs <code className="text-ink">KEYCLOAK_LINKEDIN_CLIENT_ID</code> and{' '}
-            <code className="text-ink">KEYCLOAK_LINKEDIN_CLIENT_SECRET</code> in <code className="text-ink">.env</code>,
-            then restart Keycloak. Redirect URI in the LinkedIn app should include{' '}
-            <code className="break-all text-ink">
-              http://localhost:8081/realms/luc/broker/linkedin/endpoint
-            </code>
-            .
-          </p>
-          <Link href="/alumni/verify" className={`${btnSecondary} mt-3`}>
-            Already signed in? Open verification
-          </Link>
-        </div>
+        <Link href="/alumni/verify" className={`${btnSecondary} mt-8`}>
+          Already signed in? Open verification
+        </Link>
       </div>
     </main>
   );

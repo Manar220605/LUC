@@ -85,37 +85,15 @@ export default function StudentSignupPage() {
       <div className={cardPad}>
         <h1 className={heading}>Student registration</h1>
         <p className="mt-2 text-sm text-muted">
-          Use a seeded student email from the list below. Activation codes are captured by{' '}
-          <a className="font-medium text-lu hover:text-lu-dark" href="http://localhost:8025" target="_blank" rel="noreferrer">
-            Mailhog
-          </a>{' '}
-          (they are not delivered to real Gmail inboxes in local dev).
+          Enter the personal email you registered with in your first year. We will send you an
+          activation code to confirm it is yours.
         </p>
-
-        <div className="mt-4 rounded-xl border border-lu/15 bg-lu-mist p-4 text-sm text-ink">
-          <p className="font-medium text-lu-deep">Dev test emails (use one of these)</p>
-          <ul className="mt-2 space-y-1.5">
-            <li>
-              <strong>jad.mansour@gmail.com</strong> — file 91567
-            </li>
-            <li>
-              <strong>nour.saad@gmail.com</strong> — file 100334
-            </li>
-            <li>
-              <strong>karim.haddad@gmail.com</strong> — file 95201
-            </li>
-          </ul>
-          <p className="mt-2 text-xs text-muted">
-            After “Send code”, open http://localhost:8025 and read the message subject “Your LUC
-            account activation code”. Unknown emails still show a success message but no code is sent.
-          </p>
-        </div>
 
         {step === 'email' && (
           <form onSubmit={handleLookup} className="mt-8 space-y-4">
             <div>
               <label htmlFor="email" className={label}>
-                Email (from the seed list above)
+                Email
               </label>
               <input
                 id="email"
@@ -137,13 +115,6 @@ export default function StudentSignupPage() {
         {step === 'activate' && (
           <form onSubmit={handleActivate} className="mt-8 space-y-4">
             <p className="text-sm text-ink">{lookupMessage}</p>
-            <p className="rounded-lg border border-lu/15 bg-lu-soft px-3 py-2 text-sm text-lu-deep">
-              Get your code from{' '}
-              <a className="font-semibold underline" href="http://localhost:8025" target="_blank" rel="noreferrer">
-                Mailhog (localhost:8025)
-              </a>
-              — not from Gmail.
-            </p>
             <div>
               <label htmlFor="code" className={label}>
                 6-character code
